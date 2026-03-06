@@ -1,0 +1,70 @@
+openapi: 3.0.3
+info:
+  title: OrlyFin API
+  version: 1.0.0
+  description: API REST versionada para OrlyFin.
+servers:
+  - url: /api/v1
+paths:
+  /health:
+    get:
+      summary: Health check
+      tags: [system]
+      responses:
+        '200':
+          description: Service healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status, service, version, timestamp]
+      properties:
+        status:
+          type: string
+          example: ok
+        service:
+          type: string
+          example: orlyfin-api
+        version:
+          type: string
+          example: v1
+        timestamp:
+          type: string
+          format: date-time
+    ErrorDetail:
+      type: object
+      properties:
+        field:
+          type: string
+        issue:
+          type: string
+    ErrorResponse:
+      type: object
+      required: [code, message, trace_id, timestamp]
+      properties:
+        code:
+          type: string
+          example: VALIDATION_ERROR
+        message:
+          type: string
+          example: Validation failed
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+        trace_id:
+          type: string
+          format: uuid
+        timestamp:
+          type: string
+          format: date-time

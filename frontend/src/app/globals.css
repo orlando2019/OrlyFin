@@ -1,0 +1,99 @@
+:root {
+  --bg-0: #f4f6f8;
+  --bg-1: #ffffff;
+  --ink-0: #13293d;
+  --ink-1: #355070;
+  --line: #dce3ea;
+  --accent: #1f7a8c;
+  --accent-soft: #d9eff3;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Manrope", "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top right, #e7f0f4, var(--bg-0));
+  color: var(--ink-0);
+}
+
+.of-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.of-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+}
+
+.of-brand {
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.of-subtitle {
+  margin: 0.25rem 0 0;
+  color: var(--ink-1);
+  font-size: 0.85rem;
+}
+
+.of-badge {
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--accent-soft);
+  font-size: 0.75rem;
+}
+
+.of-main {
+  padding: 1.25rem;
+}
+
+.of-panel {
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 1.25rem;
+  box-shadow: 0 10px 24px rgba(19, 41, 61, 0.06);
+}
+
+.of-panel h1 {
+  margin-top: 0;
+}
+
+.of-links {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.of-links a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .of-header {
+    align-items: flex-start;
+    gap: 0.75rem;
+    flex-direction: column;
+  }
+
+  .of-main {
+    padding: 0.9rem;
+  }
+}

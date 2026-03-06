@@ -1,0 +1,41 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: orlyfin-postgres
+    environment:
+      POSTGRES_DB: orlyfin
+      POSTGRES_USER: orlyfin
+      POSTGRES_PASSWORD: orlyfin
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: .
+      dockerfile: infra/docker/backend.Dockerfile
+    container_name: orlyfin-backend
+    env_file:
+      - .env.local.example
+    depends_on:
+      - postgres
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: infra/docker/frontend.Dockerfile
+    container_name: orlyfin-frontend
+    env_file:
+      - .env.local.example
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+
+volumes:
+  pg_data:
