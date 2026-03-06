@@ -20,3 +20,6 @@ OrlyFin adopta una arquitectura monolítica modular con enfoque híbrido por dom
 
 ## Referencias Fase 2
 - `docs/architecture/auth-rbac.md`
+
+## Referencias Fase 3
+- `docs/architecture/financial-core-v1.md`

@@ -1,16 +1,6 @@
 # Domain: income
 
-## Objetivo
-Definir capacidades de negocio del dominio income de forma modular y mantenible.
+Gestiona ingresos simples, variables y recurrentes.
 
-## Entidades principales
-- Por definir en Fase 2.
-
-## Casos de uso
-- Por definir en Fase 2.
-
-## Permisos esperados
-- read, create, update, delete (segun matriz RBAC).
-
-## Eventos auditables
-- Creacion, actualizacion, eliminacion y acciones criticas del dominio.
+- Concepto: entrada de dinero.
+- Si se asocia cuenta, incrementa saldo de la cuenta.

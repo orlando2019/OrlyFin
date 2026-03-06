@@ -136,6 +136,30 @@ body {
   background: #f7fbfc;
 }
 
+.of-grid-metrics {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.of-grid-metrics article {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.75rem;
+  background: #fbfdff;
+}
+
+.of-grid-metrics h2 {
+  margin: 0 0 0.3rem;
+  font-size: 0.9rem;
+  color: var(--ink-1);
+}
+
+.of-grid-metrics strong {
+  font-size: 1.2rem;
+}
+
 @media (max-width: 768px) {
   .of-header {
     align-items: flex-start;
@@ -145,5 +169,9 @@ body {
 
   .of-main {
     padding: 0.9rem;
+  }
+
+  .of-grid-metrics {
+    grid-template-columns: 1fr;
   }
 }

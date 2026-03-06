@@ -1,16 +1,6 @@
 # Domain: accounts
 
-## Objetivo
-Definir capacidades de negocio del dominio accounts de forma modular y mantenible.
+Gestiona cuentas financieras multiusuario (saldo, tipo y moneda).
 
-## Entidades principales
-- Por definir en Fase 2.
-
-## Casos de uso
-- Por definir en Fase 2.
-
-## Permisos esperados
-- read, create, update, delete (segun matriz RBAC).
-
-## Eventos auditables
-- Creacion, actualizacion, eliminacion y acciones criticas del dominio.
+- No registra ingresos/gastos/pagos por si mismo.
+- Recibe impacto de saldo desde `income` (+) y `payment` (-).

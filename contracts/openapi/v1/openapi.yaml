@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: OrlyFin API
-  version: 1.1.0
+  version: 1.2.0
   description: API REST versionada para OrlyFin.
 servers:
   - url: /api/v1
@@ -144,6 +144,186 @@ paths:
               schema:
                 $ref: '#/components/schemas/AssignRoleResponse'
 
+  /accounts:
+    post:
+      summary: Create financial account
+      tags: [accounts]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountCreateRequest'
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+    get:
+      summary: List financial accounts
+      tags: [accounts]
+      responses:
+        '200':
+          description: Account list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountListResponse'
+
+  /incomes:
+    post:
+      summary: Create income record
+      tags: [income]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncomeCreateRequest'
+      responses:
+        '201':
+          description: Income created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncomeResponse'
+    get:
+      summary: List income records
+      tags: [income]
+      responses:
+        '200':
+          description: Income list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncomeListResponse'
+
+  /expenses:
+    post:
+      summary: Create expense record
+      tags: [expense]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseCreateRequest'
+      responses:
+        '201':
+          description: Expense created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseResponse'
+    get:
+      summary: List expense records
+      tags: [expense]
+      responses:
+        '200':
+          description: Expense list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseListResponse'
+
+  /debts:
+    post:
+      summary: Create debt record
+      tags: [debt]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DebtCreateRequest'
+      responses:
+        '201':
+          description: Debt created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtResponse'
+    get:
+      summary: List debt records
+      tags: [debt]
+      responses:
+        '200':
+          description: Debt list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtListResponse'
+
+  /payments:
+    post:
+      summary: Create payment record
+      tags: [payment]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentCreateRequest'
+      responses:
+        '201':
+          description: Payment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+    get:
+      summary: List payment records
+      tags: [payment]
+      responses:
+        '200':
+          description: Payment list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentListResponse'
+
+  /budgets:
+    post:
+      summary: Create budget
+      tags: [budget]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BudgetCreateRequest'
+      responses:
+        '201':
+          description: Budget created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetResponse'
+    get:
+      summary: List budgets
+      tags: [budget]
+      responses:
+        '200':
+          description: Budget list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetListResponse'
+
+  /dashboard/executive:
+    get:
+      summary: Executive dashboard summary
+      tags: [dashboard]
+      responses:
+        '200':
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutiveDashboardResponse'
+
 components:
   schemas:
     HealthResponse:
@@ -228,6 +408,362 @@ components:
           type: array
           items:
             type: string
+
+    AccountCreateRequest:
+      type: object
+      required: [name, account_type, currency_code]
+      properties:
+        name:
+          type: string
+        account_type:
+          type: string
+        currency_code:
+          type: string
+        initial_balance:
+          type: number
+
+    AccountResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        organization_id:
+          type: string
+        name:
+          type: string
+        account_type:
+          type: string
+        currency_code:
+          type: string
+        current_balance:
+          type: number
+        is_active:
+          type: boolean
+
+    AccountListResponse:
+      type: object
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountResponse'
+
+    IncomeCreateRequest:
+      type: object
+      required: [category, amount, occurred_on]
+      properties:
+        account_id:
+          type: string
+          nullable: true
+        category:
+          type: string
+        description:
+          type: string
+        amount:
+          type: number
+        income_type:
+          type: string
+        frequency:
+          type: string
+          nullable: true
+        occurred_on:
+          type: string
+          format: date
+
+    IncomeResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        organization_id:
+          type: string
+        account_id:
+          type: string
+          nullable: true
+        category:
+          type: string
+        description:
+          type: string
+        amount:
+          type: number
+        income_type:
+          type: string
+        frequency:
+          type: string
+          nullable: true
+        occurred_on:
+          type: string
+          format: date
+
+    IncomeListResponse:
+      type: object
+      properties:
+        incomes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IncomeResponse'
+
+    ExpenseCreateRequest:
+      type: object
+      required: [category, amount, occurred_on]
+      properties:
+        account_id:
+          type: string
+          nullable: true
+        category:
+          type: string
+        description:
+          type: string
+        amount:
+          type: number
+        expense_type:
+          type: string
+        due_on:
+          type: string
+          format: date
+          nullable: true
+        occurred_on:
+          type: string
+          format: date
+
+    ExpenseResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        organization_id:
+          type: string
+        account_id:
+          type: string
+          nullable: true
+        category:
+          type: string
+        description:
+          type: string
+        amount:
+          type: number
+        expense_type:
+          type: string
+        due_on:
+          type: string
+          format: date
+          nullable: true
+        occurred_on:
+          type: string
+          format: date
+        status:
+          type: string
+
+    ExpenseListResponse:
+      type: object
+      properties:
+        expenses:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpenseResponse'
+
+    DebtCreateRequest:
+      type: object
+      required: [creditor, principal_amount, opened_on]
+      properties:
+        account_id:
+          type: string
+          nullable: true
+        creditor:
+          type: string
+        description:
+          type: string
+        principal_amount:
+          type: number
+        debt_type:
+          type: string
+        total_installments:
+          type: integer
+          nullable: true
+        opened_on:
+          type: string
+          format: date
+        due_on:
+          type: string
+          format: date
+          nullable: true
+
+    DebtResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        organization_id:
+          type: string
+        account_id:
+          type: string
+          nullable: true
+        creditor:
+          type: string
+        description:
+          type: string
+        principal_amount:
+          type: number
+        balance_amount:
+          type: number
+        debt_type:
+          type: string
+        total_installments:
+          type: integer
+          nullable: true
+        paid_installments:
+          type: integer
+        opened_on:
+          type: string
+          format: date
+        due_on:
+          type: string
+          format: date
+          nullable: true
+        status:
+          type: string
+
+    DebtListResponse:
+      type: object
+      properties:
+        debts:
+          type: array
+          items:
+            $ref: '#/components/schemas/DebtResponse'
+
+    PaymentCreateRequest:
+      type: object
+      required: [account_id, amount, paid_on]
+      properties:
+        account_id:
+          type: string
+        payment_type:
+          type: string
+        amount:
+          type: number
+        paid_on:
+          type: string
+          format: date
+        reference_type:
+          type: string
+          nullable: true
+        reference_id:
+          type: string
+          nullable: true
+        notes:
+          type: string
+
+    PaymentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        organization_id:
+          type: string
+        account_id:
+          type: string
+        payment_type:
+          type: string
+        amount:
+          type: number
+        paid_on:
+          type: string
+          format: date
+        reference_type:
+          type: string
+          nullable: true
+        reference_id:
+          type: string
+          nullable: true
+        notes:
+          type: string
+
+    PaymentListResponse:
+      type: object
+      properties:
+        payments:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentResponse'
+
+    BudgetCreateRequest:
+      type: object
+      required: [category, period_start, period_end, planned_amount]
+      properties:
+        category:
+          type: string
+        period_start:
+          type: string
+          format: date
+        period_end:
+          type: string
+          format: date
+        planned_amount:
+          type: number
+        alert_threshold_percent:
+          type: number
+
+    BudgetResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        organization_id:
+          type: string
+        category:
+          type: string
+        period_start:
+          type: string
+          format: date
+        period_end:
+          type: string
+          format: date
+        planned_amount:
+          type: number
+        alert_threshold_percent:
+          type: number
+        consumed_amount:
+          type: number
+        usage_percent:
+          type: number
+        threshold_reached:
+          type: boolean
+
+    BudgetListResponse:
+      type: object
+      properties:
+        budgets:
+          type: array
+          items:
+            $ref: '#/components/schemas/BudgetResponse'
+
+    ExecutiveDashboardResponse:
+      type: object
+      properties:
+        period_start:
+          type: string
+          format: date
+        period_end:
+          type: string
+          format: date
+        total_income:
+          type: number
+        total_expense:
+          type: number
+        total_payments:
+          type: number
+        outstanding_debt:
+          type: number
+        total_account_balance:
+          type: number
+        total_budget:
+          type: number
+        budget_usage_percent:
+          type: number
+        pending_expenses:
+          type: integer
+        active_debts:
+          type: integer
 
     MessageResponse:
       type: object

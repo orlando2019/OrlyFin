@@ -1,0 +1,88 @@
+from __future__ import annotations
+
+from datetime import date
+from decimal import Decimal
+
+from sqlalchemy import func, select
+from sqlalchemy.orm import Session
+
+from app.domains.expense.infrastructure.models import ExpenseRecord
+
+
+class ExpenseRepository:
+    def __init__(self, db: Session):
+        self.db = db
+
+    def create(
+        self,
+        organization_id: str,
+        account_id: str | None,
+        category: str,
+        description: str,
+        amount: Decimal,
+        expense_type: str,
+        due_on: date | None,
+        occurred_on: date,
+        status: str,
+    ) -> ExpenseRecord:
+        record = ExpenseRecord(
+            organization_id=organization_id,
+            account_id=account_id,
+            category=category,
+            description=description,
+            amount=amount,
+            expense_type=expense_type,
+            due_on=due_on,
+            occurred_on=occurred_on,
+            status=status,
+        )
+        self.db.add(record)
+        self.db.flush()
+        return record
+
+    def get_by_id_for_org(self, expense_id: str, organization_id: str) -> ExpenseRecord | None:
+        return self.db.scalar(
+            select(ExpenseRecord).where(
+                ExpenseRecord.id == expense_id,
+                ExpenseRecord.organization_id == organization_id,
+            )
+        )
+
+    def list_for_org(self, organization_id: str) -> list[ExpenseRecord]:
+        rows = self.db.scalars(
+            select(ExpenseRecord)
+            .where(ExpenseRecord.organization_id == organization_id)
+            .order_by(ExpenseRecord.occurred_on.desc(), ExpenseRecord.created_at.desc())
+        ).all()
+        return list(rows)
+
+    def sum_for_period(self, organization_id: str, start_on: date, end_on: date) -> Decimal:
+        total = self.db.scalar(
+            select(func.coalesce(func.sum(ExpenseRecord.amount), 0)).where(
+                ExpenseRecord.organization_id == organization_id,
+                ExpenseRecord.occurred_on >= start_on,
+                ExpenseRecord.occurred_on <= end_on,
+            )
+        )
+        return Decimal(total or 0)
+
+    def sum_by_category_period(self, organization_id: str, category: str, start_on: date, end_on: date) -> Decimal:
+        total = self.db.scalar(
+            select(func.coalesce(func.sum(ExpenseRecord.amount), 0)).where(
+                ExpenseRecord.organization_id == organization_id,
+                ExpenseRecord.category == category,
+                ExpenseRecord.occurred_on >= start_on,
+                ExpenseRecord.occurred_on <= end_on,
+                ExpenseRecord.status != "cancelled",
+            )
+        )
+        return Decimal(total or 0)
+
+    def count_pending(self, organization_id: str) -> int:
+        total = self.db.scalar(
+            select(func.count(ExpenseRecord.id)).where(
+                ExpenseRecord.organization_id == organization_id,
+                ExpenseRecord.status == "pending",
+            )
+        )
+        return int(total or 0)

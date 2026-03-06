@@ -19,6 +19,15 @@ API REST versionada para OrlyFin.
 - `GET /api/v1/rbac/me/permissions`
 - `POST /api/v1/rbac/users/{user_id}/roles` (protegido por permiso `rbac:update`)
 
+## Base implementada en Fase 3
+- `POST/GET /api/v1/accounts`
+- `POST/GET /api/v1/incomes`
+- `POST/GET /api/v1/expenses`
+- `POST/GET /api/v1/debts`
+- `POST/GET /api/v1/payments`
+- `POST/GET /api/v1/budgets`
+- `GET /api/v1/dashboard/executive`
+
 ## Ejecutar
 ```bash
 pip install -e .[dev]

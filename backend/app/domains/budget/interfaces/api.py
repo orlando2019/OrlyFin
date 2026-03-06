@@ -1,0 +1,30 @@
+from __future__ import annotations
+
+from fastapi import APIRouter, Depends, status
+
+from app.domains.auth_users.application.service import get_current_user
+from app.domains.auth_users.infrastructure.models import User
+from app.domains.budget.application.schemas import BudgetCreateRequest, BudgetListResponse
+from app.domains.budget.application.service import BudgetService, get_budget_service
+from app.domains.rbac.interfaces.dependencies import require_permission
+
+router = APIRouter(prefix="/budgets", tags=["budget"])
+
+
+@router.post("", status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_permission("budget", "create"))])
+def create_budget(
+    payload: BudgetCreateRequest,
+    current_user: User = Depends(get_current_user),
+    service: BudgetService = Depends(get_budget_service),
+):
+    record = service.create_budget(current_user.organization_id, payload)
+    return service.to_budget_response(current_user.organization_id, record)
+
+
+@router.get("", response_model=BudgetListResponse, dependencies=[Depends(require_permission("budget", "read"))])
+def list_budgets(
+    current_user: User = Depends(get_current_user),
+    service: BudgetService = Depends(get_budget_service),
+) -> BudgetListResponse:
+    items = service.list_budgets(current_user.organization_id)
+    return BudgetListResponse(budgets=[service.to_budget_response(current_user.organization_id, item) for item in items])

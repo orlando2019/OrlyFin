@@ -1,16 +1,7 @@
 # Domain: expense
 
-## Objetivo
-Definir capacidades de negocio del dominio expense de forma modular y mantenible.
+Gestiona gastos como compromisos/salidas conceptuales.
 
-## Entidades principales
-- Por definir en Fase 2.
-
-## Casos de uso
-- Por definir en Fase 2.
-
-## Permisos esperados
-- read, create, update, delete (segun matriz RBAC).
-
-## Eventos auditables
-- Creacion, actualizacion, eliminacion y acciones criticas del dominio.
+- Concepto: gasto no implica pago automatico.
+- Estado inicial: `pending`.
+- Cambia a `paid` cuando un pago lo referencia y cubre.

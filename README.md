@@ -20,6 +20,16 @@ OrlyFin es una aplicación financiera multiusuario con arquitectura monolítica 
 - RBAC por módulo/acción con roles iniciales (`owner_admin`, `admin`, `operator`, `viewer`).
 - Bootstrap local de organización, permisos y usuario administrador.
 
+## Estado actual (Fase 3)
+- Modulos centrales V1 implementados:
+  - cuentas (`/api/v1/accounts`)
+  - ingresos (`/api/v1/incomes`)
+  - gastos (`/api/v1/expenses`)
+  - deudas (`/api/v1/debts`)
+  - pagos (`/api/v1/payments`)
+  - presupuestos (`/api/v1/budgets`)
+  - dashboard ejecutivo (`/api/v1/dashboard/executive`)
+
 ## Estructura principal
 - `frontend/`: aplicación web Next.js por módulos.
 - `backend/`: API FastAPI versionada y modular.

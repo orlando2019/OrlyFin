@@ -67,7 +67,7 @@ async def security_headers_middleware(request: Request, call_next):
 
 @app.on_event("startup")
 def startup() -> None:
-    # Fase 2 bootstrap for local/dev. Production should rely on controlled migrations.
+    # Local/dev bootstrap. Production should rely on controlled migrations.
     Base.metadata.create_all(bind=engine)
 
     db = SessionLocal()

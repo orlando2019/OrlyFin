@@ -1,16 +1,6 @@
 # Domain: budget
 
-## Objetivo
-Definir capacidades de negocio del dominio budget de forma modular y mantenible.
+Gestiona presupuestos por categoria y periodo.
 
-## Entidades principales
-- Por definir en Fase 2.
-
-## Casos de uso
-- Por definir en Fase 2.
-
-## Permisos esperados
-- read, create, update, delete (segun matriz RBAC).
-
-## Eventos auditables
-- Creacion, actualizacion, eliminacion y acciones criticas del dominio.
+- Planea monto objetivo.
+- Calcula consumo contra gastos de la misma categoria/periodo.
