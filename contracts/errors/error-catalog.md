@@ -1,4 +1,4 @@
-# Catálogo Inicial de Errores
+# Catalogo Inicial de Errores
 
 ## Comunes
 - `VALIDATION_ERROR` (400)
@@ -9,9 +9,13 @@
 - `RATE_LIMITED` (429)
 - `INTERNAL_ERROR` (500)
 
-## Formato estándar
-- `code`: identificador funcional del error.
-- `message`: mensaje legible.
-- `details`: lista opcional de errores de campo.
-- `trace_id`: correlación para soporte.
-- `timestamp`: instante del error en UTC.
+## Seguridad/Auth
+- `UNAUTHORIZED`: token ausente, token invalido, credenciales invalidas.
+- `FORBIDDEN`: usuario autenticado sin permiso `module:action`.
+
+## Formato estandar
+- `code`
+- `message`
+- `details`
+- `trace_id`
+- `timestamp`

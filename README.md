@@ -14,6 +14,12 @@ OrlyFin es una aplicación financiera multiusuario con arquitectura monolítica 
 - Backend y frontend arrancables con entrypoints mínimos.
 - Contratos, documentación, ambientes y seguridad base.
 
+## Estado actual (Fase 2)
+- Base de autenticación implementada (`/api/v1/auth/*`).
+- Usuarios con organización y hash seguro de contraseña.
+- RBAC por módulo/acción con roles iniciales (`owner_admin`, `admin`, `operator`, `viewer`).
+- Bootstrap local de organización, permisos y usuario administrador.
+
 ## Estructura principal
 - `frontend/`: aplicación web Next.js por módulos.
 - `backend/`: API FastAPI versionada y modular.
@@ -33,6 +39,12 @@ OrlyFin es una aplicación financiera multiusuario con arquitectura monolítica 
    - `make backend-dev`
 5. Frontend:
    - `make frontend-dev`
+
+## Credenciales bootstrap local
+- Email: `admin@orlyfin.local`
+- Password: `ChangeMe123!`
+
+Se recomienda cambiarlas en `.env` antes de usar entornos compartidos.
 
 ## Estado
 Esta base no incluye todavía lógica de negocio de módulos financieros. Se implementará por fases incrementales.

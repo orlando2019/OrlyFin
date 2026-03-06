@@ -1,16 +1,16 @@
 # Domain: auth_users
 
 ## Objetivo
-Definir capacidades de negocio del dominio auth_users de forma modular y mantenible.
+Gestionar autenticacion y ciclo base de usuarios por organizacion.
 
-## Entidades principales
-- Por definir en Fase 2.
+## Alcance Fase 2
+- Login con cookies HttpOnly (access + refresh).
+- Perfil de usuario autenticado (`/auth/me`).
+- Creacion de usuarios con control de permisos (`/users`).
+- Bootstrap de organizacion y usuario admin local.
 
-## Casos de uso
-- Por definir en Fase 2.
-
-## Permisos esperados
-- read, create, update, delete (segun matriz RBAC).
-
-## Eventos auditables
-- Creacion, actualizacion, eliminacion y acciones criticas del dominio.
+## Capas
+- `domain`: entidad autenticada.
+- `application`: servicios de autenticacion y gestion de usuario.
+- `infrastructure`: modelos/repositorios de organizacion y usuario.
+- `interfaces`: endpoints REST y schemas.

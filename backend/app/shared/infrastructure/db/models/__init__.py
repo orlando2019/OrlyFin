@@ -1,1 +1,1 @@
-"""Shared SQLAlchemy mixins."""
+"""Shared SQLAlchemy mixins package."""

@@ -10,6 +10,15 @@ API REST versionada para OrlyFin.
 - Configuración por variables de entorno.
 - Base SQLAlchemy/Alembic preparada para módulos.
 
+## Base implementada en Fase 2
+- `POST /api/v1/auth/login`
+- `POST /api/v1/auth/refresh`
+- `POST /api/v1/auth/logout`
+- `GET /api/v1/auth/me`
+- `POST /api/v1/users` (protegido por permiso `auth_users:create`)
+- `GET /api/v1/rbac/me/permissions`
+- `POST /api/v1/rbac/users/{user_id}/roles` (protegido por permiso `rbac:update`)
+
 ## Ejecutar
 ```bash
 pip install -e .[dev]

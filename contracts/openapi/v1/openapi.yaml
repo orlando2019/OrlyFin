@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: OrlyFin API
-  version: 1.0.0
+  version: 1.1.0
   description: API REST versionada para OrlyFin.
 servers:
   - url: /api/v1
@@ -17,12 +17,133 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HealthResponse'
-        '500':
-          description: Internal error
+
+  /auth/login:
+    post:
+      summary: Login with email and password
+      tags: [auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthUserResponse'
+        '401':
+          description: Invalid credentials
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/refresh:
+    post:
+      summary: Rotate tokens using refresh cookie
+      tags: [auth]
+      responses:
+        '200':
+          description: Tokens refreshed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+
+  /auth/logout:
+    post:
+      summary: Logout and clear auth cookies
+      tags: [auth]
+      responses:
+        '200':
+          description: Session closed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+
+  /auth/me:
+    get:
+      summary: Get authenticated user profile and permissions
+      tags: [auth]
+      responses:
+        '200':
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users:
+    post:
+      summary: Create user in current organization
+      tags: [users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /rbac/me/permissions:
+    get:
+      summary: List current user permission keys
+      tags: [rbac]
+      responses:
+        '200':
+          description: Permission list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionListResponse'
+
+  /rbac/users/{user_id}/roles:
+    post:
+      summary: Assign roles to user
+      tags: [rbac]
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignRoleRequest'
+      responses:
+        '200':
+          description: Roles assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignRoleResponse'
+
 components:
   schemas:
     HealthResponse:
@@ -31,16 +152,118 @@ components:
       properties:
         status:
           type: string
-          example: ok
         service:
           type: string
-          example: orlyfin-api
         version:
           type: string
-          example: v1
         timestamp:
           type: string
           format: date-time
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+
+    AuthUserResponse:
+      type: object
+      required: [id, organization_id, email, full_name, is_active, roles, permissions]
+      properties:
+        id:
+          type: string
+        organization_id:
+          type: string
+        email:
+          type: string
+        full_name:
+          type: string
+        is_active:
+          type: boolean
+        roles:
+          type: array
+          items:
+            type: string
+        permissions:
+          type: array
+          items:
+            type: string
+
+    MeResponse:
+      type: object
+      required: [id, organization_id, email, full_name, roles, permissions]
+      properties:
+        id:
+          type: string
+        organization_id:
+          type: string
+        email:
+          type: string
+        full_name:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+        permissions:
+          type: array
+          items:
+            type: string
+
+    UserCreateRequest:
+      type: object
+      required: [email, full_name, password]
+      properties:
+        email:
+          type: string
+        full_name:
+          type: string
+        password:
+          type: string
+          minLength: 8
+        role_names:
+          type: array
+          items:
+            type: string
+
+    MessageResponse:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+
+    PermissionListResponse:
+      type: object
+      required: [permissions]
+      properties:
+        permissions:
+          type: array
+          items:
+            type: string
+
+    AssignRoleRequest:
+      type: object
+      properties:
+        role_names:
+          type: array
+          items:
+            type: string
+
+    AssignRoleResponse:
+      type: object
+      required: [user_id, roles]
+      properties:
+        user_id:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+
     ErrorDetail:
       type: object
       properties:
@@ -48,16 +271,15 @@ components:
           type: string
         issue:
           type: string
+
     ErrorResponse:
       type: object
       required: [code, message, trace_id, timestamp]
       properties:
         code:
           type: string
-          example: VALIDATION_ERROR
         message:
           type: string
-          example: Validation failed
         details:
           type: array
           items:

@@ -17,3 +17,6 @@ OrlyFin adopta una arquitectura monolítica modular con enfoque híbrido por dom
 ## No objetivos de Fase 1
 - No incluir implementación completa de reglas financieras.
 - No crear microservicios.
+
+## Referencias Fase 2
+- `docs/architecture/auth-rbac.md`

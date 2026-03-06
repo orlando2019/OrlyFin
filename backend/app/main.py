@@ -11,7 +11,12 @@ from starlette.responses import JSONResponse
 from app.core.config import settings
 from app.core.errors import AppError, build_error_response
 from app.core.logging import get_logger
+from app.domains.auth_users.application.service import AuthUsersService
+from app.domains.rbac.application.service import RbacService
 from app.interfaces.api.v1.router import router as api_v1_router
+from app.shared.infrastructure.db.base import Base
+from app.shared.infrastructure.db import model_registry as _model_registry  # noqa: F401
+from app.shared.infrastructure.db.session import SessionLocal, engine
 
 logger = get_logger(__name__)
 
@@ -48,6 +53,29 @@ async def trace_middleware(request: Request, call_next):
         },
     )
     return response
+
+
+@app.middleware("http")
+async def security_headers_middleware(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "no-referrer"
+    response.headers["Content-Security-Policy"] = "default-src 'self'"
+    return response
+
+
+@app.on_event("startup")
+def startup() -> None:
+    # Fase 2 bootstrap for local/dev. Production should rely on controlled migrations.
+    Base.metadata.create_all(bind=engine)
+
+    db = SessionLocal()
+    try:
+        RbacService(db).ensure_default_permissions_and_roles()
+        AuthUsersService(db).ensure_bootstrap_data()
+    finally:
+        db.close()
 
 
 @app.exception_handler(AppError)

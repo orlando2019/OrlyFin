@@ -1,40 +1,20 @@
-# Matriz RBAC Inicial
+# Matriz RBAC Inicial (Fase 2)
 
-## Roles iniciales
-- `owner_admin`
-- `admin`
-- `operator`
-- `viewer`
+## Roles
+- `owner_admin`: control total de modulos y acciones.
+- `admin`: gestion administrativa sobre operacion, sin privilegios de owner.
+- `operator`: operacion diaria en modulos transaccionales.
+- `viewer`: lectura.
 
-## Acciones estándar
-- `read`
-- `create`
-- `update`
-- `delete`
-- `approve`
-- `export`
+## Acciones por modulo
+Acciones base: `read`, `create`, `update`, `delete`, `approve`, `export`.
 
-## Módulos
-- auth_users
-- rbac
-- dashboard
-- income
-- expense
-- debt
-- payment
-- budget
-- accounts
-- credit_cards
-- reconciliation
-- alerts
-- reports
-- audit
-- attachments
-- settings
-- import_export
+## Asignacion por rol
+- `owner_admin`: todos los modulos x todas las acciones.
+- `admin`: todos los modulos x (`read`, `create`, `update`, `delete`, `export`).
+- `operator`: `income`, `expense`, `debt`, `payment`, `budget`, `accounts`, `credit_cards` x (`read`, `create`, `update`).
+- `viewer`: todos los modulos x `read`.
 
-## Política base
-- `owner_admin`: acceso total.
-- `admin`: acceso casi total sin acciones superadministrativas.
-- `operator`: operación diaria sobre módulos asignados.
-- `viewer`: solo consulta.
+## Regla tecnica
+- En runtime se valida permiso como llave `module:action`.
+- El endpoint protegido responde `403 FORBIDDEN` cuando no exista permiso.

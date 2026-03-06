@@ -21,9 +21,19 @@ class Settings(BaseSettings):
 
     jwt_access_token_minutes: int = Field(default=15, alias="JWT_ACCESS_TOKEN_MINUTES")
     jwt_refresh_token_days: int = Field(default=7, alias="JWT_REFRESH_TOKEN_DAYS")
+    jwt_algorithm: str = Field(default="HS256", alias="JWT_ALGORITHM")
+    jwt_access_secret_key: str = Field(default="change-me-access", alias="JWT_ACCESS_SECRET_KEY")
+    jwt_refresh_secret_key: str = Field(default="change-me-refresh", alias="JWT_REFRESH_SECRET_KEY")
+    jwt_access_cookie_name: str = Field(default="of_access_token", alias="JWT_ACCESS_COOKIE_NAME")
+    jwt_refresh_cookie_name: str = Field(default="of_refresh_token", alias="JWT_REFRESH_COOKIE_NAME")
     jwt_cookie_secure: bool = Field(default=False, alias="JWT_COOKIE_SECURE")
     jwt_cookie_samesite: str = Field(default="lax", alias="JWT_COOKIE_SAMESITE")
     jwt_cookie_domain: str = Field(default="localhost", alias="JWT_COOKIE_DOMAIN")
+
+    bootstrap_org_slug: str = Field(default="default-org", alias="BOOTSTRAP_ORG_SLUG")
+    bootstrap_org_name: str = Field(default="Default Organization", alias="BOOTSTRAP_ORG_NAME")
+    bootstrap_admin_email: str = Field(default="admin@orlyfin.local", alias="BOOTSTRAP_ADMIN_EMAIL")
+    bootstrap_admin_password: str = Field(default="ChangeMe123!", alias="BOOTSTRAP_ADMIN_PASSWORD")
 
     database_url: str = Field(
         default="postgresql+psycopg://orlyfin:orlyfin@localhost:5432/orlyfin",

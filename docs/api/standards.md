@@ -12,3 +12,7 @@
 ## Idempotencia y trazabilidad
 - Incluir `X-Request-Id` opcional.
 - Responder `trace_id` en errores.
+
+## Seguridad de sesión
+- Access token y refresh token en cookies HttpOnly.
+- Refresh con rotación en `/auth/refresh`.

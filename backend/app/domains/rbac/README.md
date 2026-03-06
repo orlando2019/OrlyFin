@@ -1,16 +1,16 @@
 # Domain: rbac
 
 ## Objetivo
-Definir capacidades de negocio del dominio rbac de forma modular y mantenible.
+Resolver autorizacion por rol, modulo y accion.
 
-## Entidades principales
-- Por definir en Fase 2.
+## Alcance Fase 2
+- Roles base: `owner_admin`, `admin`, `operator`, `viewer`.
+- Permisos base por llave `module:action`.
+- Endpoint de consulta de permisos actuales (`/rbac/me/permissions`).
+- Asignacion de roles a usuario (`/rbac/users/{user_id}/roles`).
 
-## Casos de uso
-- Por definir en Fase 2.
-
-## Permisos esperados
-- read, create, update, delete (segun matriz RBAC).
-
-## Eventos auditables
-- Creacion, actualizacion, eliminacion y acciones criticas del dominio.
+## Capas
+- `domain`: catalogo de modulos y acciones.
+- `application`: servicios de asignacion y evaluacion de permisos.
+- `infrastructure`: modelos/repositorios de roles, permisos y asociaciones.
+- `interfaces`: endpoints y dependencias de autorizacion.
