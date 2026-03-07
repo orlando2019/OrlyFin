@@ -6,6 +6,7 @@ Indice rapido de documentos base de OrlyFin.
 - `../README.md`: vision del proyecto, estado real y arranque local.
 - `architecture/overview.md`: arquitectura general del sistema.
 - `architecture/domain-map.md`: mapa de modulos y estado de implementacion.
+- `architecture/code-catalog.md`: catalogo tecnico de carpetas, archivos, clases y funciones relevantes.
 - `roadmap/phases.md`: roadmap por fases con criterio de cierre.
 - `technical-guidelines.md`: lineamientos tecnicos transversales.
 

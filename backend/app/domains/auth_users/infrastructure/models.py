@@ -7,6 +7,7 @@ from app.shared.infrastructure.db.base import Base
 from app.shared.infrastructure.db.models.audit_base import AuditBaseMixin
 
 
+# Modela la responsabilidad de 'organization' dentro del dominio o capa actual.
 class Organization(Base, AuditBaseMixin):
     __tablename__ = "organizations"
 
@@ -15,6 +16,7 @@ class Organization(Base, AuditBaseMixin):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
 
+# Modela la responsabilidad de 'user' dentro del dominio o capa actual.
 class User(Base, AuditBaseMixin):
     __tablename__ = "users"
     __table_args__ = (UniqueConstraint("organization_id", "email", name="uq_users_org_email"),)

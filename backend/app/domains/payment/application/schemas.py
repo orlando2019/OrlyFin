@@ -6,6 +6,7 @@ from decimal import Decimal
 from pydantic import BaseModel, Field
 
 
+# Modela la responsabilidad de 'payment create request' dentro del dominio o capa actual.
 class PaymentCreateRequest(BaseModel):
     account_id: str
     payment_type: str = Field(default="regular")
@@ -16,6 +17,7 @@ class PaymentCreateRequest(BaseModel):
     notes: str = Field(default="", max_length=255)
 
 
+# Modela la responsabilidad de 'payment response' dentro del dominio o capa actual.
 class PaymentResponse(BaseModel):
     id: str
     organization_id: str
@@ -28,5 +30,6 @@ class PaymentResponse(BaseModel):
     notes: str
 
 
+# Modela la responsabilidad de 'payment list response' dentro del dominio o capa actual.
 class PaymentListResponse(BaseModel):
     payments: list[PaymentResponse]

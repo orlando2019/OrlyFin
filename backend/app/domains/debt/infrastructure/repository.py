@@ -9,10 +9,13 @@ from sqlalchemy.orm import Session
 from app.domains.debt.infrastructure.models import DebtRecord
 
 
+# Modela la responsabilidad de 'debt repository' dentro del dominio o capa actual.
 class DebtRepository:
+    # Inicializa la instancia y prepara las dependencias necesarias para sus operaciones.
     def __init__(self, db: Session):
         self.db = db
 
+    # Ejecuta la lógica principal de 'create' y devuelve el resultado esperado por el flujo.
     def create(
         self,
         organization_id: str,
@@ -43,11 +46,13 @@ class DebtRepository:
         self.db.flush()
         return record
 
+    # Obtiene 'by id for org' y lo expone para su uso en la capa llamadora.
     def get_by_id_for_org(self, debt_id: str, organization_id: str) -> DebtRecord | None:
         return self.db.scalar(
             select(DebtRecord).where(DebtRecord.id == debt_id, DebtRecord.organization_id == organization_id)
         )
 
+    # Lista 'for org' según los filtros o el contexto recibido.
     def list_for_org(self, organization_id: str) -> list[DebtRecord]:
         rows = self.db.scalars(
             select(DebtRecord)
@@ -56,6 +61,7 @@ class DebtRepository:
         ).all()
         return list(rows)
 
+    # Ejecuta la lógica principal de 'sum outstanding' y devuelve el resultado esperado por el flujo.
     def sum_outstanding(self, organization_id: str) -> Decimal:
         total = self.db.scalar(
             select(func.coalesce(func.sum(DebtRecord.balance_amount), 0)).where(
@@ -65,6 +71,7 @@ class DebtRepository:
         )
         return Decimal(total or 0)
 
+    # Ejecuta la lógica principal de 'count active' y devuelve el resultado esperado por el flujo.
     def count_active(self, organization_id: str) -> int:
         total = self.db.scalar(
             select(func.count(DebtRecord.id)).where(

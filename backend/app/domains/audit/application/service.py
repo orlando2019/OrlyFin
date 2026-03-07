@@ -13,11 +13,14 @@ from app.domains.audit.infrastructure.models import AuditEvent
 from app.domains.audit.infrastructure.repository import AuditRepository
 
 
+# Modela la responsabilidad de 'audit service' dentro del dominio o capa actual.
 class AuditService:
+    # Inicializa la instancia y prepara las dependencias necesarias para sus operaciones.
     def __init__(self, db: Session):
         self.db = db
         self.repo = AuditRepository(db)
 
+    # Ejecuta la lógica principal de 'record event' y devuelve el resultado esperado por el flujo.
     def record_event(
         self,
         organization_id: str | None,
@@ -41,11 +44,13 @@ class AuditService:
             details_json=serialized,
         )
 
+    # Lista 'events' según los filtros o el contexto recibido.
     def list_events(self, organization_id: str, module: str | None = None, action: str | None = None, limit: int = 100) -> list[AuditEvent]:
         return self.repo.list_for_org(organization_id=organization_id, module=module, action=action, limit=min(max(limit, 1), 500))
 
 
 
+# Transforma la entidad de dominio en la estructura de respuesta 'to audit event response'.
 def to_audit_event_response(event: AuditEvent) -> AuditEventResponse:
     details: dict[str, Any]
     try:
@@ -69,5 +74,6 @@ def to_audit_event_response(event: AuditEvent) -> AuditEventResponse:
 
 
 
+# Obtiene 'audit service' y lo expone para su uso en la capa llamadora.
 def get_audit_service(db: Session = Depends(get_db)) -> AuditService:
     return AuditService(db)

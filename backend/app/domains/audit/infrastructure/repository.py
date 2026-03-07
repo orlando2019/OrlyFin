@@ -6,10 +6,13 @@ from sqlalchemy.orm import Session
 from app.domains.audit.infrastructure.models import AuditEvent
 
 
+# Modela la responsabilidad de 'audit repository' dentro del dominio o capa actual.
 class AuditRepository:
+    # Inicializa la instancia y prepara las dependencias necesarias para sus operaciones.
     def __init__(self, db: Session):
         self.db = db
 
+    # Ejecuta la lógica principal de 'create' y devuelve el resultado esperado por el flujo.
     def create(
         self,
         organization_id: str | None,
@@ -35,6 +38,7 @@ class AuditRepository:
         self.db.flush()
         return event
 
+    # Lista 'for org' según los filtros o el contexto recibido.
     def list_for_org(
         self,
         organization_id: str,

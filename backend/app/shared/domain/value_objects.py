@@ -4,11 +4,13 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 
+# Modela la responsabilidad de 'money' dentro del dominio o capa actual.
 @dataclass(frozen=True)
 class Money:
     amount: Decimal
     currency_code: str
 
+    # Helper interno que encapsula la lógica de 'ost init'.
     def __post_init__(self) -> None:
         if self.amount < 0:
             raise ValueError("amount must be >= 0")

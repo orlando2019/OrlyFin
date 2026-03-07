@@ -12,6 +12,7 @@ from app.domains.rbac.interfaces.dependencies import require_permission
 router = APIRouter(prefix="/budgets", tags=["budget"])
 
 
+# Crea 'budget' aplicando las validaciones de negocio correspondientes.
 @router.post("", status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_permission("budget", "create"))])
 def create_budget(
     payload: BudgetCreateRequest,
@@ -23,6 +24,7 @@ def create_budget(
     return service.to_budget_response(current_user.organization_id, record)
 
 
+# Lista 'budgets' según los filtros o el contexto recibido.
 @router.get("", response_model=BudgetListResponse, dependencies=[Depends(require_permission("budget", "read"))])
 def list_budgets(
     current_user: User = Depends(get_current_user),

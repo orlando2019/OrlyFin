@@ -16,13 +16,16 @@ from app.domains.expense.infrastructure.repository import ExpenseRepository
 ALLOWED_EXPENSE_TYPES = {"simple", "variable", "recurrent"}
 
 
+# Modela la responsabilidad de 'expense service' dentro del dominio o capa actual.
 class ExpenseService:
+    # Inicializa la instancia y prepara las dependencias necesarias para sus operaciones.
     def __init__(self, db: Session):
         self.db = db
         self.repo = ExpenseRepository(db)
         self.accounts_repo = AccountRepository(db)
         self.audit = AuditService(db)
 
+    # Crea 'expense' aplicando las validaciones de negocio correspondientes.
     def create_expense(
         self,
         organization_id: str,
@@ -65,11 +68,13 @@ class ExpenseService:
         self.db.commit()
         return record
 
+    # Lista 'expenses' según los filtros o el contexto recibido.
     def list_expenses(self, organization_id: str) -> list[ExpenseRecord]:
         return self.repo.list_for_org(organization_id)
 
 
 
+# Transforma la entidad de dominio en la estructura de respuesta 'to expense response'.
 def to_expense_response(record: ExpenseRecord) -> ExpenseResponse:
     return ExpenseResponse(
         id=record.id,
@@ -86,5 +91,6 @@ def to_expense_response(record: ExpenseRecord) -> ExpenseResponse:
 
 
 
+# Obtiene 'expense service' y lo expone para su uso en la capa llamadora.
 def get_expense_service(db: Session = Depends(get_db)) -> ExpenseService:
     return ExpenseService(db)

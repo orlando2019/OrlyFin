@@ -16,13 +16,16 @@ from app.domains.income.infrastructure.repository import IncomeRepository
 ALLOWED_INCOME_TYPES = {"simple", "variable", "recurrent"}
 
 
+# Modela la responsabilidad de 'income service' dentro del dominio o capa actual.
 class IncomeService:
+    # Inicializa la instancia y prepara las dependencias necesarias para sus operaciones.
     def __init__(self, db: Session):
         self.db = db
         self.repo = IncomeRepository(db)
         self.accounts_repo = AccountRepository(db)
         self.audit = AuditService(db)
 
+    # Crea 'income' aplicando las validaciones de negocio correspondientes.
     def create_income(
         self,
         organization_id: str,
@@ -70,11 +73,13 @@ class IncomeService:
         self.db.commit()
         return record
 
+    # Lista 'incomes' según los filtros o el contexto recibido.
     def list_incomes(self, organization_id: str) -> list[IncomeRecord]:
         return self.repo.list_for_org(organization_id)
 
 
 
+# Transforma la entidad de dominio en la estructura de respuesta 'to income response'.
 def to_income_response(record: IncomeRecord) -> IncomeResponse:
     return IncomeResponse(
         id=record.id,
@@ -90,5 +95,6 @@ def to_income_response(record: IncomeRecord) -> IncomeResponse:
 
 
 
+# Obtiene 'income service' y lo expone para su uso en la capa llamadora.
 def get_income_service(db: Session = Depends(get_db)) -> IncomeService:
     return IncomeService(db)

@@ -12,6 +12,7 @@ from app.domains.rbac.interfaces.dependencies import require_permission
 router = APIRouter(prefix="/debts", tags=["debt"])
 
 
+# Crea 'debt' aplicando las validaciones de negocio correspondientes.
 @router.post("", status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_permission("debt", "create"))])
 def create_debt(
     payload: DebtCreateRequest,
@@ -23,6 +24,7 @@ def create_debt(
     return to_debt_response(record)
 
 
+# Lista 'debts' según los filtros o el contexto recibido.
 @router.get("", response_model=DebtListResponse, dependencies=[Depends(require_permission("debt", "read"))])
 def list_debts(
     current_user: User = Depends(get_current_user),

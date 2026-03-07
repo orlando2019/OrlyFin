@@ -9,6 +9,7 @@ from app.shared.infrastructure.db.base import Base
 from app.shared.infrastructure.db.models.audit_base import AuditBaseMixin
 
 
+# Modela la responsabilidad de 'financial account' dentro del dominio o capa actual.
 class FinancialAccount(Base, AuditBaseMixin):
     __tablename__ = "financial_accounts"
     __table_args__ = (UniqueConstraint("organization_id", "name", name="uq_financial_accounts_org_name"),)

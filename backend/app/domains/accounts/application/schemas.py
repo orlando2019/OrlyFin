@@ -5,6 +5,7 @@ from decimal import Decimal
 from pydantic import BaseModel, Field
 
 
+# Modela la responsabilidad de 'account create request' dentro del dominio o capa actual.
 class AccountCreateRequest(BaseModel):
     name: str = Field(min_length=2, max_length=120)
     account_type: str = Field(min_length=2, max_length=40)
@@ -12,6 +13,7 @@ class AccountCreateRequest(BaseModel):
     initial_balance: Decimal = Field(default=Decimal("0.00"))
 
 
+# Modela la responsabilidad de 'account response' dentro del dominio o capa actual.
 class AccountResponse(BaseModel):
     id: str
     organization_id: str
@@ -22,5 +24,6 @@ class AccountResponse(BaseModel):
     is_active: bool
 
 
+# Modela la responsabilidad de 'account list response' dentro del dominio o capa actual.
 class AccountListResponse(BaseModel):
     accounts: list[AccountResponse]

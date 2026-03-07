@@ -10,6 +10,7 @@ from app.shared.infrastructure.db.base import Base
 from app.shared.infrastructure.db.models.audit_base import AuditBaseMixin
 
 
+# Modela la responsabilidad de 'payment record' dentro del dominio o capa actual.
 class PaymentRecord(Base, AuditBaseMixin):
     __tablename__ = "payment_records"
 

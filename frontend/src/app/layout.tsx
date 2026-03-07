@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   description: "Plataforma financiera multiusuario",
 };
 
+// Implementa la lógica de 'root layout' y retorna la estructura esperada por el módulo.
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es">

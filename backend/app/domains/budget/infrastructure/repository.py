@@ -9,10 +9,13 @@ from sqlalchemy.orm import Session
 from app.domains.budget.infrastructure.models import BudgetRecord
 
 
+# Modela la responsabilidad de 'budget repository' dentro del dominio o capa actual.
 class BudgetRepository:
+    # Inicializa la instancia y prepara las dependencias necesarias para sus operaciones.
     def __init__(self, db: Session):
         self.db = db
 
+    # Ejecuta la lógica principal de 'create' y devuelve el resultado esperado por el flujo.
     def create(
         self,
         organization_id: str,
@@ -35,6 +38,7 @@ class BudgetRepository:
         self.db.flush()
         return record
 
+    # Lista 'for org' según los filtros o el contexto recibido.
     def list_for_org(self, organization_id: str) -> list[BudgetRecord]:
         rows = self.db.scalars(
             select(BudgetRecord)
@@ -43,6 +47,7 @@ class BudgetRepository:
         ).all()
         return list(rows)
 
+    # Ejecuta la lógica principal de 'sum planned for overlap' y devuelve el resultado esperado por el flujo.
     def sum_planned_for_overlap(self, organization_id: str, start_on: date, end_on: date) -> Decimal:
         total = self.db.scalar(
             select(func.coalesce(func.sum(BudgetRecord.planned_amount), 0)).where(

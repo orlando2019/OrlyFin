@@ -3,6 +3,7 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 
+# Modela la responsabilidad de 'error response schema' dentro del dominio o capa actual.
 class ErrorResponseSchema(BaseModel):
     code: str
     message: str

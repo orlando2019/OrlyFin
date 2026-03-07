@@ -10,6 +10,7 @@ from app.shared.infrastructure.db.base import Base
 from app.shared.infrastructure.db.models.audit_base import AuditBaseMixin
 
 
+# Modela la responsabilidad de 'budget record' dentro del dominio o capa actual.
 class BudgetRecord(Base, AuditBaseMixin):
     __tablename__ = "budget_records"
 

@@ -10,6 +10,7 @@ from app.shared.infrastructure.db.base import Base
 from app.shared.infrastructure.db.models.audit_base import AuditBaseMixin
 
 
+# Modela la responsabilidad de 'expense record' dentro del dominio o capa actual.
 class ExpenseRecord(Base, AuditBaseMixin):
     __tablename__ = "expense_records"
 

@@ -10,6 +10,7 @@ from app.shared.infrastructure.db.base import Base
 from app.shared.infrastructure.db.models.audit_base import AuditBaseMixin
 
 
+# Modela la responsabilidad de 'reconciliation record' dentro del dominio o capa actual.
 class ReconciliationRecord(Base, AuditBaseMixin):
     __tablename__ = "reconciliation_records"
 

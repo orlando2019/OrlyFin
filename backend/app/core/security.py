@@ -15,6 +15,8 @@ from app.core.config import Settings, settings
 
 @dataclass(frozen=True)
 class JwtCookiePolicy:
+    # Configuración efectiva de cookies JWT.
+    # Centraliza tiempos y flags de seguridad para que login/refresh usen reglas homogéneas.
     access_token_minutes: int
     refresh_token_days: int
     secure: bool
@@ -32,6 +34,13 @@ jwt_cookie_policy = JwtCookiePolicy(
 
 
 def hash_password(plain_password: str) -> str:
+    # Deriva un hash PBKDF2-SHA256 persistible para contraseñas.
+    # Entradas:
+    # - plain_password: contraseña en texto plano.
+    # Retorno:
+    # - string con formato `algoritmo$iteraciones$salt_b64$digest_b64`.
+    # Efecto de seguridad:
+    # - usa salt aleatorio por contraseña y alto número de iteraciones.
     iterations = 210_000
     salt = os.urandom(16)
     digest = hashlib.pbkdf2_hmac("sha256", plain_password.encode("utf-8"), salt, iterations)
@@ -41,6 +50,9 @@ def hash_password(plain_password: str) -> str:
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
+    # Compara contraseña plana contra hash almacenado.
+    # Maneja formatos inválidos devolviendo False (sin lanzar error al cliente),
+    # y usa `hmac.compare_digest` para minimizar timing attacks.
     try:
         algorithm, iterations_str, salt_b64, digest_b64 = hashed_password.split("$", 3)
         if algorithm != "pbkdf2_sha256":
@@ -56,6 +68,12 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 def _build_token_payload(subject: str, token_type: str, expires_delta: timedelta, claims: dict[str, Any] | None = None) -> dict[str, Any]:
+    # Construye claims base comunes para access/refresh tokens.
+    # Incluye:
+    # - sub: identificador del usuario.
+    # - type: tipo de token ("access" o "refresh").
+    # - iat/exp: timestamps UNIX para emisión y expiración.
+    # Claims adicionales se fusionan al final para extender contexto (org/roles, etc.).
     now = datetime.now(timezone.utc)
     payload: dict[str, Any] = {
         "sub": subject,
@@ -69,6 +87,8 @@ def _build_token_payload(subject: str, token_type: str, expires_delta: timedelta
 
 
 def create_access_token(subject: str, claims: dict[str, Any] | None = None, config: Settings = settings) -> str:
+    # Emite JWT de acceso firmado con la clave de access.
+    # Se usa en autorización de requests a endpoints protegidos.
     payload = _build_token_payload(
         subject=subject,
         token_type="access",
@@ -79,6 +99,8 @@ def create_access_token(subject: str, claims: dict[str, Any] | None = None, conf
 
 
 def create_refresh_token(subject: str, claims: dict[str, Any] | None = None, config: Settings = settings) -> str:
+    # Emite JWT de refresco con vigencia más larga y clave dedicada.
+    # Se usa exclusivamente para renovar sesión, no para permisos directos.
     payload = _build_token_payload(
         subject=subject,
         token_type="refresh",
@@ -89,8 +111,11 @@ def create_refresh_token(subject: str, claims: dict[str, Any] | None = None, con
 
 
 def decode_access_token(token: str, config: Settings = settings) -> dict[str, Any]:
+    # Verifica firma y expiración del token de acceso.
+    # Retorna claims decodificadas o lanza excepción JWT si es inválido/expirado.
     return jwt.decode(token, config.jwt_access_secret_key, algorithms=[config.jwt_algorithm])
 
 
 def decode_refresh_token(token: str, config: Settings = settings) -> dict[str, Any]:
+    # Verifica firma y expiración del token de refresco con su clave específica.
     return jwt.decode(token, config.jwt_refresh_secret_key, algorithms=[config.jwt_algorithm])

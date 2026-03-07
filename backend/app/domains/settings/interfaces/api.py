@@ -12,6 +12,7 @@ from app.domains.settings.application.service import SettingsService, get_settin
 router = APIRouter(prefix="/settings", tags=["settings"])
 
 
+# Ejecuta la lógica principal de 'upsert setting' y devuelve el resultado esperado por el flujo.
 @router.post("", response_model=SettingResponse, dependencies=[Depends(require_permission("settings", "update"))])
 def upsert_setting(
     payload: SettingUpsertRequest,
@@ -28,6 +29,7 @@ def upsert_setting(
     return service.to_response(setting)
 
 
+# Lista 'settings' según los filtros o el contexto recibido.
 @router.get("", response_model=SettingListResponse, dependencies=[Depends(require_permission("settings", "read"))])
 def list_settings(
     current_user: User = Depends(get_current_user),
@@ -37,6 +39,7 @@ def list_settings(
     return SettingListResponse(settings=[service.to_response(item) for item in settings])
 
 
+# Obtiene 'setting' y lo expone para su uso en la capa llamadora.
 @router.get("/{key}", response_model=SettingResponse, dependencies=[Depends(require_permission("settings", "read"))])
 def get_setting(
     key: str,

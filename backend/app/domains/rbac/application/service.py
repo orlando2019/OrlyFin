@@ -17,6 +17,9 @@ from app.domains.rbac.infrastructure.repository import (
 
 class RbacService:
     def __init__(self, db: Session):
+        # Servicio de autorización por roles/permisos.
+        # Centraliza inicialización de catálogo RBAC, asignación de roles y checks
+        # para que controladores no implementen reglas de autorización ad hoc.
         self.db = db
         self.role_repo = RoleRepository(db)
         self.permission_repo = PermissionRepository(db)
@@ -24,6 +27,13 @@ class RbacService:
         self.role_permission_repo = RolePermissionRepository(db)
 
     def ensure_default_permissions_and_roles(self) -> None:
+        # Carga base de seguridad del sistema.
+        # Etapas:
+        # 1) crea permisos módulo-acción faltantes.
+        # 2) crea roles estándar.
+        # 3) genera mapeo rol->permisos (owner/admin/operator/viewer).
+        # 4) persiste relaciones y realiza commit.
+        # Este método es idempotente: evita duplicados consultando antes de insertar.
         for module in MODULES:
             for action in ACTIONS:
                 if self.permission_repo.get_by_module_action(module, action) is None:
@@ -71,6 +81,12 @@ class RbacService:
         self.db.commit()
 
     def assign_roles_to_user(self, user_id: str, role_names: list[str], organization_id: str) -> None:
+        # Asigna uno o más roles a un usuario existente.
+        # Validaciones de seguridad:
+        # - el usuario debe existir.
+        # - solo se permite asignar roles dentro de su misma organización.
+        # - cada rol solicitado debe existir en catálogo.
+        # Regla adicional: si no llegan roles válidos, usa "operator" como default.
         user = self.db.scalar(select(User).where(User.id == user_id))
         if user is None:
             raise AppError("NOT_FOUND", "User not found", 404)
@@ -88,6 +104,8 @@ class RbacService:
             self.user_role_repo.add(user_id=user_id, role_id=role.id, organization_id=organization_id)
 
     def get_user_roles(self, user_id: str) -> list[str]:
+        # Retorna nombres de roles del usuario sin duplicados y ordenados.
+        # Se usa para construir claims de JWT y respuestas /auth/me.
         role_ids = self.user_role_repo.get_role_ids_for_user(user_id)
         if not role_ids:
             return []
@@ -96,6 +114,8 @@ class RbacService:
         return sorted(set(rows))
 
     def get_user_permission_keys(self, user_id: str) -> list[str]:
+        # Resuelve permisos efectivos del usuario agregando permisos de todos sus roles.
+        # Formato de salida: `module:action`, listo para checks rápidos y trazables.
         role_ids = self.user_role_repo.get_role_ids_for_user(user_id)
         permission_ids = self.role_permission_repo.get_permission_ids_for_roles(role_ids)
         if not permission_ids:
@@ -106,5 +126,7 @@ class RbacService:
         return sorted(set(keys))
 
     def has_permission(self, user_id: str, module: str, action: str) -> bool:
+        # Verificación booleana final usada por dependencias FastAPI.
+        # No muta estado; únicamente consulta permisos efectivos del usuario.
         key = f"{module}:{action}"
         return key in self.get_user_permission_keys(user_id)

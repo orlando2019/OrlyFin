@@ -12,6 +12,7 @@ from app.domains.rbac.interfaces.dependencies import require_permission
 router = APIRouter(prefix="/attachments", tags=["attachments"])
 
 
+# Ejecuta la lógica principal de 'upload attachment' y devuelve el resultado esperado por el flujo.
 @router.post("/upload", response_model=AttachmentResponse, dependencies=[Depends(require_permission("attachments", "create"))])
 async def upload_attachment(
     module: str = Form(...),
@@ -32,6 +33,7 @@ async def upload_attachment(
     return to_attachment_response(record)
 
 
+# Ejecuta la lógica principal de 'delete attachment' y devuelve el resultado esperado por el flujo.
 @router.delete("/{attachment_id}", response_model=AttachmentResponse, dependencies=[Depends(require_permission("attachments", "delete"))])
 def delete_attachment(
     attachment_id: str,
@@ -43,6 +45,7 @@ def delete_attachment(
     return to_attachment_response(record)
 
 
+# Lista 'attachments' según los filtros o el contexto recibido.
 @router.get("", response_model=AttachmentListResponse, dependencies=[Depends(require_permission("attachments", "read"))])
 def list_attachments(
     module: str | None = Query(default=None),

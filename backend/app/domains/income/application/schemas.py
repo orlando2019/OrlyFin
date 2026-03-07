@@ -6,6 +6,7 @@ from decimal import Decimal
 from pydantic import BaseModel, Field
 
 
+# Modela la responsabilidad de 'income create request' dentro del dominio o capa actual.
 class IncomeCreateRequest(BaseModel):
     account_id: str | None = None
     category: str = Field(min_length=2, max_length=80)
@@ -16,6 +17,7 @@ class IncomeCreateRequest(BaseModel):
     occurred_on: date
 
 
+# Modela la responsabilidad de 'income response' dentro del dominio o capa actual.
 class IncomeResponse(BaseModel):
     id: str
     organization_id: str
@@ -28,5 +30,6 @@ class IncomeResponse(BaseModel):
     occurred_on: date
 
 
+# Modela la responsabilidad de 'income list response' dentro del dominio o capa actual.
 class IncomeListResponse(BaseModel):
     incomes: list[IncomeResponse]

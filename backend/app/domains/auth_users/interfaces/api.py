@@ -18,6 +18,9 @@ users_router = APIRouter(prefix="/users", tags=["users"])
 
 
 def _set_auth_cookies(response: Response, access_token: str, refresh_token: str) -> None:
+    # Escribe cookies HttpOnly para access/refresh token con política centralizada.
+    # Ajusta `domain` para entorno local evitando enviar "localhost" explícito cuando
+    # el navegador requiere host-only cookies.
     cookie_domain = None if jwt_cookie_policy.domain in {"", "localhost"} else jwt_cookie_policy.domain
     response.set_cookie(
         key=settings.jwt_access_cookie_name,
@@ -42,6 +45,8 @@ def _set_auth_cookies(response: Response, access_token: str, refresh_token: str)
 
 
 def _clear_auth_cookies(response: Response) -> None:
+    # Invalida sesión en cliente eliminando ambas cookies de autenticación.
+    # Se usa en logout para cortar acceso aunque los JWT no hayan expirado aún.
     response.delete_cookie(settings.jwt_access_cookie_name, path="/")
     response.delete_cookie(settings.jwt_refresh_cookie_name, path="/")
 
@@ -53,6 +58,13 @@ def login(
     _: None = limit_requests("auth_login", limit=8, window_seconds=60),
     auth_service: AuthUsersService = Depends(get_auth_users_service),
 ) -> AuthUserResponse:
+    # Endpoint de autenticación principal.
+    # Flujo:
+    # 1) valida credenciales con AuthUsersService.
+    # 2) genera par de tokens.
+    # 3) escribe cookies seguras.
+    # 4) devuelve perfil + roles/permisos para inicializar UI.
+    # Protección adicional: rate limit por IP/firma para frenar fuerza bruta.
     user, auth_info = auth_service.authenticate(payload.email, payload.password)
     access_token, refresh_token = auth_service.issue_token_pair(user, auth_info["claims"])
     _set_auth_cookies(response, access_token, refresh_token)
@@ -74,6 +86,9 @@ def refresh_token(
     response: Response,
     auth_service: AuthUsersService = Depends(get_auth_users_service),
 ) -> AuthMessageResponse:
+    # Renueva sesión usando refresh cookie existente.
+    # Requiere refresh válido, recalcula roles actuales y emite nuevo par de tokens.
+    # Retorna mensaje simple; el estado real de sesión queda en cookies.
     refresh_token = request.cookies.get(settings.jwt_refresh_cookie_name)
     if not refresh_token:
         raise AppError("UNAUTHORIZED", "Refresh token missing", 401)
@@ -88,6 +103,7 @@ def refresh_token(
 
 @router.post("/logout", response_model=AuthMessageResponse)
 def logout(response: Response) -> AuthMessageResponse:
+    # Cierre de sesión idempotente. Siempre intenta limpiar cookies y responde 200.
     _clear_auth_cookies(response)
     return AuthMessageResponse(message="Session closed")
 
@@ -97,6 +113,8 @@ def me(
     current_user: User = Depends(get_current_user),
     auth_service: AuthUsersService = Depends(get_auth_users_service),
 ) -> MeResponse:
+    # Expone identidad y autorizaciones del usuario autenticado actual.
+    # Este endpoint permite al frontend reconstruir sesión tras recarga.
     roles = auth_service.rbac_service.get_user_roles(current_user.id)
     permissions = auth_service.rbac_service.get_user_permission_keys(current_user.id)
     return MeResponse(
@@ -120,6 +138,10 @@ def create_user(
     auth_service: AuthUsersService = Depends(get_auth_users_service),
     current_user: User = Depends(get_current_user),
 ) -> MeResponse:
+    # Crea usuario dentro de la organización del `current_user`.
+    # Seguridad:
+    # - requiere permiso `auth_users:create` vía dependencia RBAC.
+    # - evita alta cruzada entre organizaciones tomando organization_id del token.
     user = auth_service.create_user(
         organization_id=current_user.organization_id,
         email=payload.email,

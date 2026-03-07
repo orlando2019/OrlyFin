@@ -7,6 +7,7 @@ from app.shared.infrastructure.db.base import Base
 from app.shared.infrastructure.db.models.audit_base import AuditBaseMixin
 
 
+# Modela la responsabilidad de 'attachment record' dentro del dominio o capa actual.
 class AttachmentRecord(Base, AuditBaseMixin):
     __tablename__ = "attachment_records"
 

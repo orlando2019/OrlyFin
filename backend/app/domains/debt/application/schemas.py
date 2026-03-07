@@ -6,6 +6,7 @@ from decimal import Decimal
 from pydantic import BaseModel, Field
 
 
+# Modela la responsabilidad de 'debt create request' dentro del dominio o capa actual.
 class DebtCreateRequest(BaseModel):
     account_id: str | None = None
     creditor: str = Field(min_length=2, max_length=120)
@@ -17,6 +18,7 @@ class DebtCreateRequest(BaseModel):
     due_on: date | None = None
 
 
+# Modela la responsabilidad de 'debt response' dentro del dominio o capa actual.
 class DebtResponse(BaseModel):
     id: str
     organization_id: str
@@ -33,5 +35,6 @@ class DebtResponse(BaseModel):
     status: str
 
 
+# Modela la responsabilidad de 'debt list response' dentro del dominio o capa actual.
 class DebtListResponse(BaseModel):
     debts: list[DebtResponse]

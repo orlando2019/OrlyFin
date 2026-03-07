@@ -9,6 +9,7 @@ from app.shared.infrastructure.db.base import Base
 from app.shared.infrastructure.db.models.audit_base import AuditBaseMixin
 
 
+# Modela la responsabilidad de 'audit event' dentro del dominio o capa actual.
 class AuditEvent(Base, AuditBaseMixin):
     __tablename__ = "audit_events"
 

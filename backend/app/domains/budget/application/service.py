@@ -14,13 +14,16 @@ from app.domains.budget.infrastructure.repository import BudgetRepository
 from app.domains.expense.infrastructure.repository import ExpenseRepository
 
 
+# Modela la responsabilidad de 'budget service' dentro del dominio o capa actual.
 class BudgetService:
+    # Inicializa la instancia y prepara las dependencias necesarias para sus operaciones.
     def __init__(self, db: Session):
         self.db = db
         self.repo = BudgetRepository(db)
         self.expense_repo = ExpenseRepository(db)
         self.audit = AuditService(db)
 
+    # Crea 'budget' aplicando las validaciones de negocio correspondientes.
     def create_budget(
         self,
         organization_id: str,
@@ -57,9 +60,11 @@ class BudgetService:
         self.db.commit()
         return record
 
+    # Lista 'budgets' según los filtros o el contexto recibido.
     def list_budgets(self, organization_id: str) -> list[BudgetRecord]:
         return self.repo.list_for_org(organization_id)
 
+    # Transforma la entidad de dominio en la estructura de respuesta 'to budget response'.
     def to_budget_response(self, organization_id: str, record: BudgetRecord) -> BudgetResponse:
         consumed = self.expense_repo.sum_by_category_period(
             organization_id=organization_id,
@@ -86,5 +91,6 @@ class BudgetService:
 
 
 
+# Obtiene 'budget service' y lo expone para su uso en la capa llamadora.
 def get_budget_service(db: Session = Depends(get_db)) -> BudgetService:
     return BudgetService(db)

@@ -7,6 +7,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    # Fuente central de configuración del backend.
+    # Lee variables de entorno (y opcionalmente ../.env) y las expone tipadas.
+    # Todas las capas consumen esta clase para evitar literales dispersos.
     model_config = SettingsConfigDict(env_file="../.env", env_file_encoding="utf-8", extra="ignore")
 
     app_name: str = Field(default="orlyfin-api", alias="APP_NAME")
@@ -55,6 +58,8 @@ class Settings(BaseSettings):
     @field_validator("cors_origins", mode="before")
     @classmethod
     def parse_cors_origins(cls, value: str | list[str]) -> list[str]:
+        # Permite configurar CORS como lista real o como string CSV.
+        # Retorno: lista limpia de orígenes sin espacios vacíos.
         if isinstance(value, list):
             return value
         return [item.strip() for item in value.split(",") if item.strip()]
@@ -62,6 +67,8 @@ class Settings(BaseSettings):
     @field_validator("attachment_allowed_mime_types", mode="before")
     @classmethod
     def parse_attachment_allowed_mime_types(cls, value: str | list[str]) -> list[str]:
+        # Normaliza tipos MIME permitidos para adjuntos desde CSV o lista.
+        # Este valor se usa en la capa de attachments para validar uploads.
         if isinstance(value, list):
             return value
         return [item.strip() for item in value.split(",") if item.strip()]
@@ -69,6 +76,8 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings() -> Settings:
+    # Crea una sola instancia de Settings por proceso.
+    # Beneficio: evita releer/parsing de entorno en cada import o request.
     return Settings()
 
 

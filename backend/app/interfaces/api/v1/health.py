@@ -9,6 +9,7 @@ from app.interfaces.schemas.common import HealthResponse
 router = APIRouter()
 
 
+# Ejecuta la lógica principal de 'health check' y devuelve el resultado esperado por el flujo.
 @router.get("/health", response_model=HealthResponse)
 def health_check() -> HealthResponse:
     return HealthResponse(

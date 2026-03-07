@@ -11,6 +11,7 @@ from app.domains.rbac.interfaces.schemas import AssignRoleRequest, AssignRoleRes
 router = APIRouter(prefix="/rbac", tags=["rbac"])
 
 
+# Ejecuta la lógica principal de 'my permissions' y devuelve el resultado esperado por el flujo.
 @router.get("/me/permissions", response_model=PermissionListResponse)
 def my_permissions(
     current_user: User = Depends(get_current_user),
@@ -24,6 +25,7 @@ def my_permissions(
     response_model=AssignRoleResponse,
     dependencies=[Depends(require_permission("rbac", "update"))],
 )
+# Ejecuta la lógica principal de 'assign roles' y devuelve el resultado esperado por el flujo.
 def assign_roles(
     user_id: str,
     payload: AssignRoleRequest,

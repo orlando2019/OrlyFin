@@ -17,6 +17,7 @@ router = APIRouter(prefix="/accounts", tags=["accounts"])
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(require_permission("accounts", "create"))],
 )
+# Crea 'account' aplicando las validaciones de negocio correspondientes.
 def create_account(
     payload: AccountCreateRequest,
     current_user: User = Depends(get_current_user),
@@ -27,6 +28,7 @@ def create_account(
     return to_account_response(account)
 
 
+# Lista 'accounts' según los filtros o el contexto recibido.
 @router.get("", response_model=AccountListResponse, dependencies=[Depends(require_permission("accounts", "read"))])
 def list_accounts(
     current_user: User = Depends(get_current_user),

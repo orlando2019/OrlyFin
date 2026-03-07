@@ -7,6 +7,7 @@ from app.shared.infrastructure.db.base import Base
 from app.shared.infrastructure.db.models.audit_base import AuditBaseMixin
 
 
+# Modela la responsabilidad de 'system setting' dentro del dominio o capa actual.
 class SystemSetting(Base, AuditBaseMixin):
     __tablename__ = "system_settings"
     __table_args__ = (UniqueConstraint("organization_id", "key", name="uq_system_settings_org_key"),)

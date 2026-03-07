@@ -18,6 +18,9 @@ from app.domains.payment.infrastructure.repository import PaymentRepository
 
 class DashboardService:
     def __init__(self, db: Session):
+        # Servicio de agregación ejecutiva financiera.
+        # Toma datos de múltiples dominios (income, expense, debt, payment, budget, accounts)
+        # y los consolida en una sola vista para panel gerencial.
         self.db = db
         self.income_repo = IncomeRepository(db)
         self.expense_repo = ExpenseRepository(db)
@@ -27,6 +30,16 @@ class DashboardService:
         self.account_repo = AccountRepository(db)
 
     def get_executive_summary(self, organization_id: str, reference_date: date | None = None) -> ExecutiveDashboardResponse:
+        # Construye métricas ejecutivas del mes en curso (o hasta `reference_date`).
+        # Parámetros:
+        # - organization_id: alcance tenant para evitar mezcla de datos multiusuario.
+        # - reference_date: fecha de corte opcional; si no llega usa `date.today()`.
+        # Retorno:
+        # - ExecutiveDashboardResponse con totales, contadores operativos y uso de presupuesto.
+        # Reglas relevantes:
+        # - periodo siempre inicia en el día 1 del mes de referencia.
+        # - evita división por cero en uso de presupuesto.
+        # - redondea porcentaje a 2 decimales (ROUND_HALF_UP) para consistencia financiera.
         ref = reference_date or date.today()
         period_start = ref.replace(day=1)
         period_end = ref
@@ -58,4 +71,5 @@ class DashboardService:
 
 
 def get_dashboard_service(db: Session = Depends(get_db)) -> DashboardService:
+    # Adaptador DI para inyectar DashboardService en endpoints.
     return DashboardService(db)

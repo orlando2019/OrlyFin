@@ -12,6 +12,7 @@ from app.domains.rbac.interfaces.dependencies import require_permission
 router = APIRouter(prefix="/payments", tags=["payment"])
 
 
+# Crea 'payment' aplicando las validaciones de negocio correspondientes.
 @router.post("", status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_permission("payment", "create"))])
 def create_payment(
     payload: PaymentCreateRequest,
@@ -23,6 +24,7 @@ def create_payment(
     return to_payment_response(record)
 
 
+# Lista 'payments' según los filtros o el contexto recibido.
 @router.get("", response_model=PaymentListResponse, dependencies=[Depends(require_permission("payment", "read"))])
 def list_payments(
     current_user: User = Depends(get_current_user),

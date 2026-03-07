@@ -16,13 +16,16 @@ from app.domains.debt.infrastructure.repository import DebtRepository
 ALLOWED_DEBT_TYPES = {"simple", "installment"}
 
 
+# Modela la responsabilidad de 'debt service' dentro del dominio o capa actual.
 class DebtService:
+    # Inicializa la instancia y prepara las dependencias necesarias para sus operaciones.
     def __init__(self, db: Session):
         self.db = db
         self.repo = DebtRepository(db)
         self.accounts_repo = AccountRepository(db)
         self.audit = AuditService(db)
 
+    # Crea 'debt' aplicando las validaciones de negocio correspondientes.
     def create_debt(
         self,
         organization_id: str,
@@ -67,11 +70,13 @@ class DebtService:
         self.db.commit()
         return record
 
+    # Lista 'debts' según los filtros o el contexto recibido.
     def list_debts(self, organization_id: str) -> list[DebtRecord]:
         return self.repo.list_for_org(organization_id)
 
 
 
+# Transforma la entidad de dominio en la estructura de respuesta 'to debt response'.
 def to_debt_response(record: DebtRecord) -> DebtResponse:
     return DebtResponse(
         id=record.id,
@@ -91,5 +96,6 @@ def to_debt_response(record: DebtRecord) -> DebtResponse:
 
 
 
+# Obtiene 'debt service' y lo expone para su uso en la capa llamadora.
 def get_debt_service(db: Session = Depends(get_db)) -> DebtService:
     return DebtService(db)

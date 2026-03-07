@@ -11,10 +11,15 @@ const currency = new Intl.NumberFormat("en-US", {
 });
 
 function money(value: string): string {
+  // Formatea decimales de backend a moneda legible en UI.
+  // Recibe string para mantener contrato API y convierte de forma defensiva.
   return currency.format(Number(value || 0));
 }
 
 export function ExecutiveDashboardPanel() {
+  // Panel ejecutivo principal del frontend.
+  // Se encarga de cargar métricas agregadas y representar estados de la consulta:
+  // loading -> error -> sin datos -> vista de métricas.
   const [data, setData] = useState<ExecutiveDashboard | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -23,6 +28,9 @@ export function ExecutiveDashboardPanel() {
     let active = true;
 
     async function load() {
+      // Carga datos una sola vez al montar.
+      // `active` evita actualizar estado si el componente se desmonta antes
+      // de que termine la promesa (previene warnings por setState tardío).
       try {
         const payload = await getExecutiveDashboard();
         if (active) setData(payload);

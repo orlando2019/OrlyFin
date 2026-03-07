@@ -9,6 +9,7 @@ from app.shared.infrastructure.db.base import Base
 from app.shared.infrastructure.db.models.audit_base import AuditBaseMixin
 
 
+# Modela la responsabilidad de 'alert record' dentro del dominio o capa actual.
 class AlertRecord(Base, AuditBaseMixin):
     __tablename__ = "alert_records"
 

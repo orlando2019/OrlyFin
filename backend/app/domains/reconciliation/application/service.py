@@ -18,13 +18,16 @@ from app.domains.reconciliation.infrastructure.models import ReconciliationRecor
 from app.domains.reconciliation.infrastructure.repository import ReconciliationRepository
 
 
+# Modela la responsabilidad de 'reconciliation service' dentro del dominio o capa actual.
 class ReconciliationService:
+    # Inicializa la instancia y prepara las dependencias necesarias para sus operaciones.
     def __init__(self, db: Session):
         self.db = db
         self.repo = ReconciliationRepository(db)
         self.accounts_repo = AccountRepository(db)
         self.audit = AuditService(db)
 
+    # Crea 'reconciliation' aplicando las validaciones de negocio correspondientes.
     def create_reconciliation(
         self,
         organization_id: str,
@@ -70,6 +73,7 @@ class ReconciliationService:
         self.db.commit()
         return record
 
+    # Ejecuta la lógica principal de 'resolve reconciliation' y devuelve el resultado esperado por el flujo.
     def resolve_reconciliation(
         self,
         organization_id: str,
@@ -99,11 +103,13 @@ class ReconciliationService:
         self.db.commit()
         return record
 
+    # Lista 'reconciliations' según los filtros o el contexto recibido.
     def list_reconciliations(self, organization_id: str, account_id: str | None = None) -> list[ReconciliationRecord]:
         return self.repo.list_for_org(organization_id, account_id=account_id)
 
 
 
+# Transforma la entidad de dominio en la estructura de respuesta 'to reconciliation response'.
 def to_reconciliation_response(record: ReconciliationRecord) -> ReconciliationResponse:
     return ReconciliationResponse(
         id=record.id,
@@ -120,5 +126,6 @@ def to_reconciliation_response(record: ReconciliationRecord) -> ReconciliationRe
 
 
 
+# Obtiene 'reconciliation service' y lo expone para su uso en la capa llamadora.
 def get_reconciliation_service(db: Session = Depends(get_db)) -> ReconciliationService:
     return ReconciliationService(db)

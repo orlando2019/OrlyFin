@@ -10,6 +10,7 @@ from app.shared.infrastructure.db.base import Base
 from app.shared.infrastructure.db.models.audit_base import AuditBaseMixin
 
 
+# Modela la responsabilidad de 'income record' dentro del dominio o capa actual.
 class IncomeRecord(Base, AuditBaseMixin):
     __tablename__ = "income_records"
 

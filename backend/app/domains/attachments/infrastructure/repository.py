@@ -6,10 +6,13 @@ from sqlalchemy.orm import Session
 from app.domains.attachments.infrastructure.models import AttachmentRecord
 
 
+# Modela la responsabilidad de 'attachment repository' dentro del dominio o capa actual.
 class AttachmentRepository:
+    # Inicializa la instancia y prepara las dependencias necesarias para sus operaciones.
     def __init__(self, db: Session):
         self.db = db
 
+    # Ejecuta la lógica principal de 'create' y devuelve el resultado esperado por el flujo.
     def create(
         self,
         organization_id: str,
@@ -38,6 +41,7 @@ class AttachmentRepository:
         self.db.flush()
         return record
 
+    # Obtiene 'by id for org' y lo expone para su uso en la capa llamadora.
     def get_by_id_for_org(self, attachment_id: str, organization_id: str) -> AttachmentRecord | None:
         return self.db.scalar(
             select(AttachmentRecord).where(
@@ -46,6 +50,7 @@ class AttachmentRepository:
             )
         )
 
+    # Lista 'for org' según los filtros o el contexto recibido.
     def list_for_org(self, organization_id: str, module: str | None = None, entity_id: str | None = None) -> list[AttachmentRecord]:
         query = select(AttachmentRecord).where(AttachmentRecord.organization_id == organization_id)
         if module:

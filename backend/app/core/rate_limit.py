@@ -13,7 +13,9 @@ _RATE_STATE: dict[str, list[float]] = defaultdict(list)
 _RATE_LOCK = threading.Lock()
 
 
+# Ejecuta la lógica principal de 'limit requests' y devuelve el resultado esperado por el flujo.
 def limit_requests(key_prefix: str, limit: int, window_seconds: int) -> Callable:
+    # Ejecuta la lógica principal de 'dependency' y devuelve el resultado esperado por el flujo.
     def dependency(request: Request) -> None:
         client_ip = request.client.host if request.client else "unknown"
         key = f"{key_prefix}:{client_ip}"

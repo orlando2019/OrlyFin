@@ -15,12 +15,15 @@ from app.domains.accounts.infrastructure.repository import AccountRepository
 ALLOWED_ACCOUNT_TYPES = {"cash", "bank", "wallet", "credit", "investment", "other"}
 
 
+# Modela la responsabilidad de 'accounts service' dentro del dominio o capa actual.
 class AccountsService:
+    # Inicializa la instancia y prepara las dependencias necesarias para sus operaciones.
     def __init__(self, db: Session):
         self.db = db
         self.repo = AccountRepository(db)
         self.audit = AuditService(db)
 
+    # Crea 'account' aplicando las validaciones de negocio correspondientes.
     def create_account(
         self,
         organization_id: str,
@@ -57,11 +60,13 @@ class AccountsService:
         self.db.commit()
         return account
 
+    # Lista 'accounts' según los filtros o el contexto recibido.
     def list_accounts(self, organization_id: str) -> list[FinancialAccount]:
         return self.repo.list_for_org(organization_id)
 
 
 
+# Transforma la entidad de dominio en la estructura de respuesta 'to account response'.
 def to_account_response(account: FinancialAccount) -> AccountResponse:
     return AccountResponse(
         id=account.id,
@@ -75,5 +80,6 @@ def to_account_response(account: FinancialAccount) -> AccountResponse:
 
 
 
+# Obtiene 'accounts service' y lo expone para su uso en la capa llamadora.
 def get_accounts_service(db: Session = Depends(get_db)) -> AccountsService:
     return AccountsService(db)

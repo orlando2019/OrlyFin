@@ -21,6 +21,7 @@ from app.domains.reconciliation.application.service import (
 router = APIRouter(prefix="/reconciliations", tags=["reconciliation"])
 
 
+# Crea 'reconciliation' aplicando las validaciones de negocio correspondientes.
 @router.post("", response_model=ReconciliationResponse, status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_permission("reconciliation", "create"))])
 def create_reconciliation(
     payload: ReconciliationCreateRequest,
@@ -37,6 +38,7 @@ def create_reconciliation(
     return to_reconciliation_response(record)
 
 
+# Lista 'reconciliations' según los filtros o el contexto recibido.
 @router.get("", response_model=ReconciliationListResponse, dependencies=[Depends(require_permission("reconciliation", "read"))])
 def list_reconciliations(
     account_id: str | None = Query(default=None),
@@ -47,6 +49,7 @@ def list_reconciliations(
     return ReconciliationListResponse(reconciliations=[to_reconciliation_response(item) for item in rows])
 
 
+# Ejecuta la lógica principal de 'resolve reconciliation' y devuelve el resultado esperado por el flujo.
 @router.post("/{reconciliation_id}/resolve", response_model=ReconciliationResponse, dependencies=[Depends(require_permission("reconciliation", "update"))])
 def resolve_reconciliation(
     reconciliation_id: str,

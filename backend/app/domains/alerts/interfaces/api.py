@@ -12,6 +12,7 @@ from app.domains.rbac.interfaces.dependencies import require_permission
 router = APIRouter(prefix="/alerts", tags=["alerts"])
 
 
+# Ejecuta la lógica principal de 'evaluate alerts' y devuelve el resultado esperado por el flujo.
 @router.post("/evaluate", response_model=EvaluateAlertsResponse, dependencies=[Depends(require_permission("alerts", "create"))])
 def evaluate_alerts(
     current_user: User = Depends(get_current_user),
@@ -22,6 +23,7 @@ def evaluate_alerts(
     return EvaluateAlertsResponse(generated=generated)
 
 
+# Lista 'alerts' según los filtros o el contexto recibido.
 @router.get("", response_model=AlertListResponse, dependencies=[Depends(require_permission("alerts", "read"))])
 def list_alerts(
     status: str | None = Query(default=None),
@@ -32,6 +34,7 @@ def list_alerts(
     return AlertListResponse(alerts=[to_alert_response(item) for item in alerts])
 
 
+# Ejecuta la lógica principal de 'mark alert read' y devuelve el resultado esperado por el flujo.
 @router.post("/{alert_id}/read", response_model=AlertResponse, dependencies=[Depends(require_permission("alerts", "update"))])
 def mark_alert_read(
     alert_id: str,

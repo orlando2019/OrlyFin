@@ -16,12 +16,15 @@ from app.domains.settings.infrastructure.repository import SettingsRepository
 SUPPORTED_TYPES = {"string", "int", "float", "bool", "json"}
 
 
+# Modela la responsabilidad de 'settings service' dentro del dominio o capa actual.
 class SettingsService:
+    # Inicializa la instancia y prepara las dependencias necesarias para sus operaciones.
     def __init__(self, db: Session):
         self.db = db
         self.repo = SettingsRepository(db)
         self.audit = AuditService(db)
 
+    # Helper interno que encapsula la lógica de 'erialize'.
     def _serialize(self, value_type: str, value: Any) -> str:
         if value_type == "string":
             return str(value)
@@ -35,6 +38,7 @@ class SettingsService:
             return json.dumps(value, ensure_ascii=True)
         raise AppError("VALIDATION_ERROR", "Unsupported value_type", 400)
 
+    # Helper interno que encapsula la lógica de 'eserialize'.
     def _deserialize(self, value_type: str, value: str) -> Any:
         if value_type == "string":
             return value
@@ -48,6 +52,7 @@ class SettingsService:
             return json.loads(value)
         return value
 
+    # Ejecuta la lógica principal de 'upsert setting' y devuelve el resultado esperado por el flujo.
     def upsert_setting(
         self,
         organization_id: str,
@@ -80,15 +85,18 @@ class SettingsService:
         self.db.commit()
         return setting
 
+    # Obtiene 'setting' y lo expone para su uso en la capa llamadora.
     def get_setting(self, organization_id: str, key: str) -> SystemSetting:
         setting = self.repo.get_by_key(organization_id, key)
         if setting is None:
             raise AppError("NOT_FOUND", "Setting not found", 404)
         return setting
 
+    # Lista 'settings' según los filtros o el contexto recibido.
     def list_settings(self, organization_id: str) -> list[SystemSetting]:
         return self.repo.list_for_org(organization_id)
 
+    # Transforma la entidad de dominio en la estructura de respuesta 'to response'.
     def to_response(self, setting: SystemSetting) -> SettingResponse:
         value = None if setting.is_sensitive else self._deserialize(setting.value_type, setting.value)
         return SettingResponse(
@@ -100,5 +108,6 @@ class SettingsService:
 
 
 
+# Obtiene 'settings service' y lo expone para su uso en la capa llamadora.
 def get_settings_service(db: Session = Depends(get_db)) -> SettingsService:
     return SettingsService(db)

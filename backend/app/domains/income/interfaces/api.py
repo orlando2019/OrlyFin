@@ -12,6 +12,7 @@ from app.domains.rbac.interfaces.dependencies import require_permission
 router = APIRouter(prefix="/incomes", tags=["income"])
 
 
+# Crea 'income' aplicando las validaciones de negocio correspondientes.
 @router.post("", status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_permission("income", "create"))])
 def create_income(
     payload: IncomeCreateRequest,
@@ -23,6 +24,7 @@ def create_income(
     return to_income_response(record)
 
 
+# Lista 'incomes' según los filtros o el contexto recibido.
 @router.get("", response_model=IncomeListResponse, dependencies=[Depends(require_permission("income", "read"))])
 def list_incomes(
     current_user: User = Depends(get_current_user),

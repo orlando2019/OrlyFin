@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 
 
+# Modela la responsabilidad de 'domain event' dentro del dominio o capa actual.
 @dataclass(frozen=True)
 class DomainEvent:
     name: str

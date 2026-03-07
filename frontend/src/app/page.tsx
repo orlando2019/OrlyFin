@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+// Renderiza la página 'home page' y compone su contenido principal.
 export default function HomePage() {
   return (
     <section className="of-panel">

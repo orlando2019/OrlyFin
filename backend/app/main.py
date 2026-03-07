@@ -24,7 +24,10 @@ logger = get_logger(__name__)
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    # Local convenience only when explicitly enabled by environment.
+    # Orquesta tareas de inicio/cierre de la app.
+    # - Si DB_AUTO_CREATE_SCHEMA=true crea tablas usando los modelos registrados.
+    # - Si BOOTSTRAP_SECURITY_DATA=true asegura permisos/roles base y usuario admin inicial.
+    # No retorna datos; su efecto es dejar la plataforma lista antes de aceptar requests.
     if settings.db_auto_create_schema:
         Base.metadata.create_all(bind=engine)
 
@@ -51,6 +54,14 @@ app.add_middleware(
 
 @app.middleware("http")
 async def trace_middleware(request: Request, call_next):
+    # Genera/propaga un identificador de traza por request y mide duración de punta a punta.
+    # Entradas:
+    # - request: objeto HTTP entrante.
+    # - call_next: callback de FastAPI para continuar el pipeline.
+    # Efectos:
+    # - Guarda trace_id en request.state para que handlers/dependencias lo reutilicen.
+    # - Expone X-Trace-Id en la respuesta para correlación cliente-servidor.
+    # - Emite log estructurado con ruta, método, estado y latencia.
     trace_id = request.headers.get("X-Request-Id", str(uuid.uuid4()))
     request.state.trace_id = trace_id
     start = time.perf_counter()
@@ -75,6 +86,9 @@ async def trace_middleware(request: Request, call_next):
 
 @app.middleware("http")
 async def security_headers_middleware(request: Request, call_next):
+    # Aplica cabeceras mínimas de hardening OWASP en todas las respuestas.
+    # Este middleware no valida payloads; su propósito es reducir vectores comunes
+    # como MIME sniffing, clickjacking y fuga de referer.
     response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
@@ -85,6 +99,9 @@ async def security_headers_middleware(request: Request, call_next):
 
 @app.exception_handler(AppError)
 async def app_error_handler(request: Request, exc: AppError):
+    # Traduce errores de negocio/controlados a un contrato JSON uniforme.
+    # Mantiene code/message/details definidos por la capa de dominio y añade trace_id
+    # para diagnóstico transversal entre logs y respuesta cliente.
     payload = build_error_response(
         code=exc.code,
         message=exc.message,
@@ -96,6 +113,9 @@ async def app_error_handler(request: Request, exc: AppError):
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    # Normaliza errores de validación de FastAPI/Pydantic al contrato estándar de API.
+    # Convierte cada error en {field, issue} para que frontend pueda mostrar feedback
+    # por campo sin depender del formato interno del framework.
     details = [{"field": ".".join(map(str, err["loc"])), "issue": err["msg"]} for err in exc.errors()]
     payload = build_error_response(
         code="VALIDATION_ERROR",
@@ -108,6 +128,9 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 @app.exception_handler(Exception)
 async def unhandled_exception_handler(request: Request, _: Exception):
+    # Fallback global para excepciones no controladas.
+    # Evita filtrar detalles internos al cliente y mantiene un 500 consistente
+    # con trace_id para investigar el incidente en logs.
     payload = build_error_response(
         code="INTERNAL_ERROR",
         message="Unexpected internal error",

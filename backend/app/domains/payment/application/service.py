@@ -19,7 +19,9 @@ ALLOWED_PAYMENT_TYPES = {"regular", "debt", "installment"}
 ALLOWED_REFERENCE_TYPES = {None, "expense", "debt", "other"}
 
 
+# Modela la responsabilidad de 'payment service' dentro del dominio o capa actual.
 class PaymentService:
+    # Inicializa la instancia y prepara las dependencias necesarias para sus operaciones.
     def __init__(self, db: Session):
         self.db = db
         self.repo = PaymentRepository(db)
@@ -28,6 +30,7 @@ class PaymentService:
         self.debt_repo = DebtRepository(db)
         self.audit = AuditService(db)
 
+    # Crea 'payment' aplicando las validaciones de negocio correspondientes.
     def create_payment(
         self,
         organization_id: str,
@@ -108,11 +111,13 @@ class PaymentService:
         self.db.commit()
         return payment
 
+    # Lista 'payments' según los filtros o el contexto recibido.
     def list_payments(self, organization_id: str) -> list[PaymentRecord]:
         return self.repo.list_for_org(organization_id)
 
 
 
+# Transforma la entidad de dominio en la estructura de respuesta 'to payment response'.
 def to_payment_response(record: PaymentRecord) -> PaymentResponse:
     return PaymentResponse(
         id=record.id,
@@ -128,5 +133,6 @@ def to_payment_response(record: PaymentRecord) -> PaymentResponse:
 
 
 
+# Obtiene 'payment service' y lo expone para su uso en la capa llamadora.
 def get_payment_service(db: Session = Depends(get_db)) -> PaymentService:
     return PaymentService(db)

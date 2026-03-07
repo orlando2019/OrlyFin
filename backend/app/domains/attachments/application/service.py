@@ -21,18 +21,22 @@ _SAFE_FILENAME = re.compile(r"[^a-zA-Z0-9._-]+")
 _SAFE_SEGMENT = re.compile(r"[^a-zA-Z0-9_-]+")
 
 
+# Modela la responsabilidad de 'attachments service' dentro del dominio o capa actual.
 class AttachmentsService:
+    # Inicializa la instancia y prepara las dependencias necesarias para sus operaciones.
     def __init__(self, db: Session):
         self.db = db
         self.repo = AttachmentRepository(db)
         self.audit = AuditService(db)
         self.storage = LocalStorageProvider(base_path=settings.attachments_storage_path)
 
+    # Helper interno que encapsula la lógica de 'afe name'.
     def _safe_name(self, file_name: str) -> str:
         name = Path(file_name).name
         cleaned = _SAFE_FILENAME.sub("_", name)
         return cleaned[:200] if cleaned else "file"
 
+    # Helper interno que encapsula la lógica de 'alidate file'.
     def _validate_file(self, mime_type: str, size_bytes: int) -> None:
         max_bytes = settings.attachment_max_size_mb * 1024 * 1024
         if size_bytes <= 0:
@@ -42,12 +46,14 @@ class AttachmentsService:
         if mime_type not in settings.attachment_allowed_mime_types:
             raise AppError("VALIDATION_ERROR", "Attachment mime type is not allowed", 400)
 
+    # Helper interno que encapsula la lógica de 'afe segment'.
     def _safe_segment(self, value: str, label: str) -> str:
         cleaned = _SAFE_SEGMENT.sub("_", value.strip())
         if not cleaned:
             raise AppError("VALIDATION_ERROR", f"Attachment {label} is invalid", 400)
         return cleaned[:120]
 
+    # Ejecuta la lógica principal de 'upload attachment' y devuelve el resultado esperado por el flujo.
     async def upload_attachment(
         self,
         organization_id: str,
@@ -97,6 +103,7 @@ class AttachmentsService:
         self.db.commit()
         return record
 
+    # Ejecuta la lógica principal de 'delete attachment' y devuelve el resultado esperado por el flujo.
     def delete_attachment(self, organization_id: str, actor_user_id: str, trace_id: str, attachment_id: str) -> AttachmentRecord:
         record = self.repo.get_by_id_for_org(attachment_id, organization_id)
         if record is None:
@@ -123,11 +130,13 @@ class AttachmentsService:
         self.db.commit()
         return record
 
+    # Lista 'attachments' según los filtros o el contexto recibido.
     def list_attachments(self, organization_id: str, module: str | None = None, entity_id: str | None = None) -> list[AttachmentRecord]:
         return self.repo.list_for_org(organization_id, module=module, entity_id=entity_id)
 
 
 
+# Transforma la entidad de dominio en la estructura de respuesta 'to attachment response'.
 def to_attachment_response(record: AttachmentRecord) -> AttachmentResponse:
     return AttachmentResponse(
         id=record.id,
@@ -141,5 +150,6 @@ def to_attachment_response(record: AttachmentRecord) -> AttachmentResponse:
 
 
 
+# Obtiene 'attachments service' y lo expone para su uso en la capa llamadora.
 def get_attachments_service(db: Session = Depends(get_db)) -> AttachmentsService:
     return AttachmentsService(db)

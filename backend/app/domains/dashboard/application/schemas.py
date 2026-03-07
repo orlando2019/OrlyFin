@@ -6,6 +6,7 @@ from decimal import Decimal
 from pydantic import BaseModel
 
 
+# Modela la responsabilidad de 'executive dashboard response' dentro del dominio o capa actual.
 class ExecutiveDashboardResponse(BaseModel):
     period_start: date
     period_end: date

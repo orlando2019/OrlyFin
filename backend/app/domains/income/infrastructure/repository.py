@@ -9,10 +9,13 @@ from sqlalchemy.orm import Session
 from app.domains.income.infrastructure.models import IncomeRecord
 
 
+# Modela la responsabilidad de 'income repository' dentro del dominio o capa actual.
 class IncomeRepository:
+    # Inicializa la instancia y prepara las dependencias necesarias para sus operaciones.
     def __init__(self, db: Session):
         self.db = db
 
+    # Ejecuta la lógica principal de 'create' y devuelve el resultado esperado por el flujo.
     def create(
         self,
         organization_id: str,
@@ -38,6 +41,7 @@ class IncomeRepository:
         self.db.flush()
         return record
 
+    # Lista 'for org' según los filtros o el contexto recibido.
     def list_for_org(self, organization_id: str) -> list[IncomeRecord]:
         rows = self.db.scalars(
             select(IncomeRecord)
@@ -46,6 +50,7 @@ class IncomeRepository:
         ).all()
         return list(rows)
 
+    # Ejecuta la lógica principal de 'sum for period' y devuelve el resultado esperado por el flujo.
     def sum_for_period(self, organization_id: str, start_on: date, end_on: date) -> Decimal:
         total = self.db.scalar(
             select(func.coalesce(func.sum(IncomeRecord.amount), 0)).where(

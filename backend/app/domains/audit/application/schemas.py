@@ -3,6 +3,7 @@ from __future__ import annotations
 from pydantic import BaseModel
 
 
+# Modela la responsabilidad de 'audit event response' dentro del dominio o capa actual.
 class AuditEventResponse(BaseModel):
     id: str
     organization_id: str | None
@@ -16,5 +17,6 @@ class AuditEventResponse(BaseModel):
     occurred_on: str
 
 
+# Modela la responsabilidad de 'audit event list response' dentro del dominio o capa actual.
 class AuditEventListResponse(BaseModel):
     events: list[AuditEventResponse]

@@ -16,6 +16,7 @@ router = APIRouter(prefix="/audit", tags=["audit"])
     response_model=AuditEventListResponse,
     dependencies=[Depends(require_permission("audit", "read"))],
 )
+# Lista 'audit events' según los filtros o el contexto recibido.
 def list_audit_events(
     module: str | None = Query(default=None),
     action: str | None = Query(default=None),
