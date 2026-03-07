@@ -3,6 +3,8 @@ import os
 os.environ.setdefault("DATABASE_URL", "sqlite+pysqlite:///./test_health.db")
 os.environ.setdefault("JWT_ACCESS_SECRET_KEY", "test-access-secret-at-least-32-bytes")
 os.environ.setdefault("JWT_REFRESH_SECRET_KEY", "test-refresh-secret-at-least-32-bytes")
+os.environ.setdefault("DB_AUTO_CREATE_SCHEMA", "true")
+os.environ.setdefault("BOOTSTRAP_SECURITY_DATA", "true")
 
 from fastapi.testclient import TestClient
 

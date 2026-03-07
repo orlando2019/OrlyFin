@@ -15,7 +15,7 @@ frontend-dev:
 	cd frontend && npm run dev
 
 test-backend:
-	cd backend && pytest -q
+	cd backend && if [ -x ./.venv/bin/pytest ]; then ./.venv/bin/pytest -q; else python -m pytest -q; fi
 
 tree:
 	find . -maxdepth 4 -type d | sort

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import time
 import uuid
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -20,7 +21,24 @@ from app.shared.infrastructure.db.session import SessionLocal, engine
 
 logger = get_logger(__name__)
 
-app = FastAPI(title=settings.app_name, version="1.0.0")
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    # Local convenience only when explicitly enabled by environment.
+    if settings.db_auto_create_schema:
+        Base.metadata.create_all(bind=engine)
+
+    if settings.bootstrap_security_data:
+        db = SessionLocal()
+        try:
+            RbacService(db).ensure_default_permissions_and_roles()
+            AuthUsersService(db).ensure_bootstrap_data()
+        finally:
+            db.close()
+    yield
+
+
+app = FastAPI(title=settings.app_name, version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -63,19 +81,6 @@ async def security_headers_middleware(request: Request, call_next):
     response.headers["Referrer-Policy"] = "no-referrer"
     response.headers["Content-Security-Policy"] = "default-src 'self'"
     return response
-
-
-@app.on_event("startup")
-def startup() -> None:
-    # Local/dev bootstrap. Production should rely on controlled migrations.
-    Base.metadata.create_all(bind=engine)
-
-    db = SessionLocal()
-    try:
-        RbacService(db).ensure_default_permissions_and_roles()
-        AuthUsersService(db).ensure_bootstrap_data()
-    finally:
-        db.close()
 
 
 @app.exception_handler(AppError)

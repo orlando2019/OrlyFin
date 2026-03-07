@@ -13,6 +13,8 @@ os.environ.setdefault("ATTACHMENT_MAX_SIZE_MB", "2")
 os.environ.setdefault("ATTACHMENT_ALLOWED_MIME_TYPES", "text/plain,application/pdf")
 os.environ.setdefault("ALERT_DEBT_DUE_DAYS", "7")
 os.environ.setdefault("ALERT_PENDING_EXPENSE_THRESHOLD", "10")
+os.environ.setdefault("DB_AUTO_CREATE_SCHEMA", "true")
+os.environ.setdefault("BOOTSTRAP_SECURITY_DATA", "true")
 
 from fastapi.testclient import TestClient
 

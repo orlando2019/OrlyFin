@@ -18,6 +18,7 @@ from app.domains.audit.application.service import AuditService
 from app.shared.infrastructure.storage.local_provider import LocalStorageProvider
 
 _SAFE_FILENAME = re.compile(r"[^a-zA-Z0-9._-]+")
+_SAFE_SEGMENT = re.compile(r"[^a-zA-Z0-9_-]+")
 
 
 class AttachmentsService:
@@ -41,6 +42,12 @@ class AttachmentsService:
         if mime_type not in settings.attachment_allowed_mime_types:
             raise AppError("VALIDATION_ERROR", "Attachment mime type is not allowed", 400)
 
+    def _safe_segment(self, value: str, label: str) -> str:
+        cleaned = _SAFE_SEGMENT.sub("_", value.strip())
+        if not cleaned:
+            raise AppError("VALIDATION_ERROR", f"Attachment {label} is invalid", 400)
+        return cleaned[:120]
+
     async def upload_attachment(
         self,
         organization_id: str,
@@ -56,14 +63,19 @@ class AttachmentsService:
 
         checksum = hashlib.sha256(data).hexdigest()
         safe_name = self._safe_name(file.filename or "attachment")
-        storage_rel_path = f"{organization_id}/{module}/{entity_id}/{uuid.uuid4().hex}_{safe_name}"
-        self.storage.save(storage_rel_path, data)
+        safe_module = self._safe_segment(module, "module")
+        safe_entity_id = self._safe_segment(entity_id, "entity_id")
+        storage_rel_path = f"{organization_id}/{safe_module}/{safe_entity_id}/{uuid.uuid4().hex}_{safe_name}"
+        try:
+            self.storage.save(storage_rel_path, data)
+        except ValueError as exc:
+            raise AppError("VALIDATION_ERROR", "Attachment path is invalid", 400) from exc
 
         record = self.repo.create(
             organization_id=organization_id,
             uploaded_by_user_id=actor_user_id,
-            module=module,
-            entity_id=entity_id,
+            module=safe_module,
+            entity_id=safe_entity_id,
             file_name=safe_name,
             mime_type=mime_type,
             size_bytes=len(data),
@@ -79,7 +91,7 @@ class AttachmentsService:
             entity_type="attachment",
             entity_id=record.id,
             trace_id=trace_id,
-            details={"module": module, "entity_id": entity_id, "mime_type": mime_type, "size_bytes": len(data)},
+            details={"module": safe_module, "entity_id": safe_entity_id, "mime_type": mime_type, "size_bytes": len(data)},
         )
 
         self.db.commit()
@@ -92,7 +104,10 @@ class AttachmentsService:
         if record.status == "deleted":
             return record
 
-        self.storage.delete(record.storage_path)
+        try:
+            self.storage.delete(record.storage_path)
+        except ValueError as exc:
+            raise AppError("VALIDATION_ERROR", "Attachment path is invalid", 400) from exc
         record.status = "deleted"
 
         self.audit.record_event(

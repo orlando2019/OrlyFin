@@ -49,6 +49,8 @@ class Settings(BaseSettings):
         default="postgresql+psycopg://orlyfin:orlyfin@localhost:5432/orlyfin",
         alias="DATABASE_URL",
     )
+    db_auto_create_schema: bool = Field(default=False, alias="DB_AUTO_CREATE_SCHEMA")
+    bootstrap_security_data: bool = Field(default=False, alias="BOOTSTRAP_SECURITY_DATA")
 
     @field_validator("cors_origins", mode="before")
     @classmethod

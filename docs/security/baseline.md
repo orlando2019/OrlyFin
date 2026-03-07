@@ -11,11 +11,11 @@ Linea base minima para operar OrlyFin por fases.
 - Rate limiting base en login.
 - Auditoria de operaciones criticas.
 - Validacion de adjuntos por tipo MIME y tamano.
+- Endurecimiento de storage local para evitar path traversal en adjuntos.
+- Bootstrap de seguridad y auto-creacion de esquema controlados por flags de entorno.
 
 ## Controles pendientes o a reforzar
 - Endurecer proteccion CSRF para endpoints mutables con cookies.
-- Revisar y endurecer manejo de rutas de adjuntos para evitar traversal.
-- Mover bootstrap automatico de datos de seguridad fuera de runtime productivo.
 - Definir rotacion operativa de secretos y politica de revocacion de sesiones.
 
 ## Reglas operativas

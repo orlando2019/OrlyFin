@@ -6,7 +6,7 @@ bash infra/scripts/check-env.sh
 
 echo "[bootstrap] Instalando dependencias backend..."
 if command -v pip >/dev/null 2>&1; then
-  (cd backend && pip install -e .)
+  (cd backend && pip install -e .[dev])
 else
   echo "[bootstrap] pip no encontrado, omitiendo backend"
 fi

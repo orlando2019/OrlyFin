@@ -8,6 +8,8 @@ os.environ.setdefault("JWT_ACCESS_SECRET_KEY", "test-access-secret-at-least-32-b
 os.environ.setdefault("JWT_REFRESH_SECRET_KEY", "test-refresh-secret-at-least-32-bytes")
 os.environ.setdefault("BOOTSTRAP_ADMIN_EMAIL", "admin@orlyfin.local")
 os.environ.setdefault("BOOTSTRAP_ADMIN_PASSWORD", "ChangeMe123!")
+os.environ.setdefault("DB_AUTO_CREATE_SCHEMA", "true")
+os.environ.setdefault("BOOTSTRAP_SECURITY_DATA", "true")
 
 from fastapi.testclient import TestClient
 

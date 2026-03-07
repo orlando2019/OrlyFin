@@ -5,11 +5,14 @@ info:
   description: API REST versionada para OrlyFin.
 servers:
   - url: /api/v1
+security:
+  - CookieAuth: []
 paths:
   /health:
     get:
       summary: Health check
       tags: [system]
+      security: []
       responses:
         '200':
           description: Service healthy
@@ -22,6 +25,7 @@ paths:
     post:
       summary: Login with email and password
       tags: [auth]
+      security: []
       requestBody:
         required: true
         content:
@@ -46,6 +50,7 @@ paths:
     post:
       summary: Rotate tokens using refresh cookie
       tags: [auth]
+      security: []
       responses:
         '200':
           description: Tokens refreshed
@@ -58,6 +63,7 @@ paths:
     post:
       summary: Logout and clear auth cookies
       tags: [auth]
+      security: []
       responses:
         '200':
           description: Session closed
@@ -525,6 +531,24 @@ paths:
                 $ref: '#/components/schemas/SettingResponse'
 
 components:
+  securitySchemes:
+    CookieAuth:
+      type: apiKey
+      in: cookie
+      name: of_access_token
+  responses:
+    UnauthorizedError:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ForbiddenError:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   schemas:
     HealthResponse:
       type: object

@@ -16,7 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <p className="of-brand">OrlyFin</p>
               <p className="of-subtitle">Financial Control Platform</p>
             </div>
-            <span className="of-badge">Fase 1</span>
+            <span className="of-badge">Fase 5</span>
           </header>
           <main className="of-main">{children}</main>
         </div>

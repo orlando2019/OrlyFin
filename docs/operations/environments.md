@@ -18,6 +18,7 @@ Ambientes soportados:
 - Politica de cookies (`secure`, `samesite`, `domain`) por ambiente.
 - Nivel de logging por ambiente.
 - Secretos propios por ambiente.
+- Flags de arranque controlado (`DB_AUTO_CREATE_SCHEMA`, `BOOTSTRAP_SECURITY_DATA`) segun ambiente.
 
 ## Archivos de referencia
 - `.env.example`: plantilla base.
@@ -27,3 +28,4 @@ Ambientes soportados:
 - No desplegar usando valores default de secretos.
 - Validar variables con `make check-env` antes de arrancar.
 - Migraciones de esquema deben ejecutarse de forma controlada por pipeline/operacion.
+- En `qa/prod`, mantener `DB_AUTO_CREATE_SCHEMA=false` y `BOOTSTRAP_SECURITY_DATA=false`.
