@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_db
 from app.core.errors import AppError
+from app.domains.audit.application.service import AuditService
 from app.domains.accounts.infrastructure.repository import AccountRepository
 from app.domains.expense.application.schemas import ExpenseCreateRequest, ExpenseResponse
 from app.domains.expense.infrastructure.models import ExpenseRecord
@@ -20,8 +21,15 @@ class ExpenseService:
         self.db = db
         self.repo = ExpenseRepository(db)
         self.accounts_repo = AccountRepository(db)
+        self.audit = AuditService(db)
 
-    def create_expense(self, organization_id: str, payload: ExpenseCreateRequest) -> ExpenseRecord:
+    def create_expense(
+        self,
+        organization_id: str,
+        payload: ExpenseCreateRequest,
+        actor_user_id: str | None = None,
+        trace_id: str | None = None,
+    ) -> ExpenseRecord:
         if payload.amount <= 0:
             raise AppError("VALIDATION_ERROR", "amount must be > 0", 400)
         if payload.expense_type not in ALLOWED_EXPENSE_TYPES:
@@ -43,6 +51,17 @@ class ExpenseService:
             occurred_on=payload.occurred_on,
             status="pending",
         )
+        if actor_user_id:
+            self.audit.record_event(
+                organization_id=organization_id,
+                user_id=actor_user_id,
+                module="expense",
+                action="create",
+                entity_type="expense_record",
+                entity_id=record.id,
+                trace_id=trace_id,
+                details={"amount": str(payload.amount), "category": payload.category, "status": "pending"},
+            )
         self.db.commit()
         return record
 

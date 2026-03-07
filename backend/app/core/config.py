@@ -35,6 +35,16 @@ class Settings(BaseSettings):
     bootstrap_admin_email: str = Field(default="admin@orlyfin.local", alias="BOOTSTRAP_ADMIN_EMAIL")
     bootstrap_admin_password: str = Field(default="ChangeMe123!", alias="BOOTSTRAP_ADMIN_PASSWORD")
 
+    attachments_storage_path: str = Field(default="./storage/attachments", alias="ATTACHMENTS_STORAGE_PATH")
+    attachment_max_size_mb: int = Field(default=5, alias="ATTACHMENT_MAX_SIZE_MB")
+    attachment_allowed_mime_types: list[str] = Field(
+        default=["application/pdf", "image/png", "image/jpeg", "text/csv", "text/plain"],
+        alias="ATTACHMENT_ALLOWED_MIME_TYPES",
+    )
+
+    alert_debt_due_days: int = Field(default=7, alias="ALERT_DEBT_DUE_DAYS")
+    alert_pending_expense_threshold: int = Field(default=10, alias="ALERT_PENDING_EXPENSE_THRESHOLD")
+
     database_url: str = Field(
         default="postgresql+psycopg://orlyfin:orlyfin@localhost:5432/orlyfin",
         alias="DATABASE_URL",
@@ -43,6 +53,13 @@ class Settings(BaseSettings):
     @field_validator("cors_origins", mode="before")
     @classmethod
     def parse_cors_origins(cls, value: str | list[str]) -> list[str]:
+        if isinstance(value, list):
+            return value
+        return [item.strip() for item in value.split(",") if item.strip()]
+
+    @field_validator("attachment_allowed_mime_types", mode="before")
+    @classmethod
+    def parse_attachment_allowed_mime_types(cls, value: str | list[str]) -> list[str]:
         if isinstance(value, list):
             return value
         return [item.strip() for item in value.split(",") if item.strip()]

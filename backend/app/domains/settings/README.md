@@ -1,16 +1,6 @@
 # Domain: settings
 
-## Objetivo
-Definir capacidades de negocio del dominio settings de forma modular y mantenible.
+Gestiona configuracion parametrizable por organizacion.
 
-## Entidades principales
-- Por definir en Fase 2.
-
-## Casos de uso
-- Por definir en Fase 2.
-
-## Permisos esperados
-- read, create, update, delete (segun matriz RBAC).
-
-## Eventos auditables
-- Creacion, actualizacion, eliminacion y acciones criticas del dominio.
+- Soporta tipos: string, int, float, bool, json.
+- Permite crear/actualizar, consultar y listar parametros.

@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_db
 from app.core.errors import AppError
+from app.domains.audit.application.service import AuditService
 from app.domains.accounts.infrastructure.repository import AccountRepository
 from app.domains.debt.application.schemas import DebtCreateRequest, DebtResponse
 from app.domains.debt.infrastructure.models import DebtRecord
@@ -20,8 +21,15 @@ class DebtService:
         self.db = db
         self.repo = DebtRepository(db)
         self.accounts_repo = AccountRepository(db)
+        self.audit = AuditService(db)
 
-    def create_debt(self, organization_id: str, payload: DebtCreateRequest) -> DebtRecord:
+    def create_debt(
+        self,
+        organization_id: str,
+        payload: DebtCreateRequest,
+        actor_user_id: str | None = None,
+        trace_id: str | None = None,
+    ) -> DebtRecord:
         if payload.principal_amount <= 0:
             raise AppError("VALIDATION_ERROR", "principal_amount must be > 0", 400)
         if payload.debt_type not in ALLOWED_DEBT_TYPES:
@@ -45,6 +53,17 @@ class DebtService:
             opened_on=payload.opened_on,
             due_on=payload.due_on,
         )
+        if actor_user_id:
+            self.audit.record_event(
+                organization_id=organization_id,
+                user_id=actor_user_id,
+                module="debt",
+                action="create",
+                entity_type="debt_record",
+                entity_id=record.id,
+                trace_id=trace_id,
+                details={"creditor": payload.creditor, "principal_amount": str(payload.principal_amount)},
+            )
         self.db.commit()
         return record
 

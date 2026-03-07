@@ -1,60 +1,55 @@
 # OrlyFin
 
-OrlyFin es una aplicación financiera multiusuario con arquitectura monolítica modular por dominios.
+OrlyFin es una aplicacion financiera multiusuario construida como monolito modular por dominios.
 
-## Stack
+## Stack obligatorio
 - Frontend: Next.js
 - Backend: FastAPI
 - Base de datos: PostgreSQL
 - ORM: SQLAlchemy
 
-## Objetivo de esta fase (Fase 1)
-- Base profesional de monorepo.
-- Arquitectura híbrida por dominios definida.
-- Backend y frontend arrancables con entrypoints mínimos.
-- Contratos, documentación, ambientes y seguridad base.
+## Estado real del proyecto
+- Backend con API v1 activa para auth, RBAC, modulos financieros base y modulos operativos.
+- Frontend con base modular y UI funcional en autenticacion y dashboard ejecutivo.
+- Contratos y documentacion por fases disponibles en `contracts/` y `docs/`.
 
-## Estado actual (Fase 2)
-- Base de autenticación implementada (`/api/v1/auth/*`).
-- Usuarios con organización y hash seguro de contraseña.
-- RBAC por módulo/acción con roles iniciales (`owner_admin`, `admin`, `operator`, `viewer`).
-- Bootstrap local de organización, permisos y usuario administrador.
+## Modulos backend implementados
+- `auth_users`, `rbac`
+- `accounts`, `income`, `expense`, `debt`, `payment`, `budget`, `dashboard`
+- `reconciliation`, `alerts`, `audit`, `attachments`, `settings`
 
-## Estado actual (Fase 3)
-- Modulos centrales V1 implementados:
-  - cuentas (`/api/v1/accounts`)
-  - ingresos (`/api/v1/incomes`)
-  - gastos (`/api/v1/expenses`)
-  - deudas (`/api/v1/debts`)
-  - pagos (`/api/v1/payments`)
-  - presupuestos (`/api/v1/budgets`)
-  - dashboard ejecutivo (`/api/v1/dashboard/executive`)
+## Modulos planificados (sin implementacion funcional completa)
+- `credit_cards`, `reports`, `import_export`
 
-## Estructura principal
-- `frontend/`: aplicación web Next.js por módulos.
-- `backend/`: API FastAPI versionada y modular.
-- `contracts/`: OpenAPI, errores y RBAC.
-- `docs/`: arquitectura, seguridad, operaciones y roadmap.
+## Estructura del monorepo
+- `frontend/`: aplicacion Next.js (App Router) con organizacion por modulos.
+- `backend/`: API FastAPI versionada por dominios.
+- `contracts/`: OpenAPI, catalogo de errores y matriz RBAC.
+- `docs/`: arquitectura, roadmap, operaciones, seguridad y lineamientos tecnicos.
 - `database/`: lineamientos de modelo y semillas.
-- `infra/`: Dockerfiles y scripts operativos.
+- `infra/`: dockerfiles y scripts de bootstrap.
 
-## Inicio rápido
-1. Copia variables de entorno:
+## Inicio rapido local
+1. Copiar variables base:
    - `cp .env.example .env`
-2. Verifica entorno:
+2. Verificar variables requeridas:
    - `make check-env`
-3. Levanta dependencias:
+3. Levantar PostgreSQL:
    - `docker compose up -d postgres`
-4. Backend:
+4. Levantar backend:
    - `make backend-dev`
-5. Frontend:
+5. Levantar frontend:
    - `make frontend-dev`
 
 ## Credenciales bootstrap local
 - Email: `admin@orlyfin.local`
 - Password: `ChangeMe123!`
 
-Se recomienda cambiarlas en `.env` antes de usar entornos compartidos.
+Cambialas antes de usar entornos compartidos.
 
-## Estado
-Esta base no incluye todavía lógica de negocio de módulos financieros. Se implementará por fases incrementales.
+## Documentacion recomendada para arrancar
+- Arquitectura general: `docs/architecture/overview.md`
+- Mapa de modulos: `docs/architecture/domain-map.md`
+- Roadmap: `docs/roadmap/phases.md`
+- Lineamientos tecnicos: `docs/technical-guidelines.md`
+- API y contratos: `docs/api/standards.md` y `contracts/openapi/v1/openapi.yaml`

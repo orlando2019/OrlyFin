@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: OrlyFin API
-  version: 1.2.0
+  version: 1.3.0
   description: API REST versionada para OrlyFin.
 servers:
   - url: /api/v1
@@ -323,6 +323,206 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExecutiveDashboardResponse'
+
+  /reconciliations:
+    post:
+      summary: Create reconciliation for account period
+      tags: [reconciliation]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReconciliationCreateRequest'
+      responses:
+        '201':
+          description: Reconciliation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReconciliationResponse'
+    get:
+      summary: List reconciliations
+      tags: [reconciliation]
+      responses:
+        '200':
+          description: Reconciliation list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReconciliationListResponse'
+
+  /reconciliations/{reconciliation_id}/resolve:
+    post:
+      summary: Resolve reconciliation
+      tags: [reconciliation]
+      parameters:
+        - in: path
+          name: reconciliation_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReconciliationResolveRequest'
+      responses:
+        '200':
+          description: Reconciliation resolved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReconciliationResponse'
+
+  /alerts/evaluate:
+    post:
+      summary: Evaluate alert rules and generate alerts
+      tags: [alerts]
+      responses:
+        '200':
+          description: Evaluation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluateAlertsResponse'
+
+  /alerts:
+    get:
+      summary: List alerts
+      tags: [alerts]
+      responses:
+        '200':
+          description: Alert list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertListResponse'
+
+  /alerts/{alert_id}/read:
+    post:
+      summary: Mark alert as read
+      tags: [alerts]
+      parameters:
+        - in: path
+          name: alert_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Alert updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertResponse'
+
+  /audit/events:
+    get:
+      summary: List audit events
+      tags: [audit]
+      responses:
+        '200':
+          description: Audit events list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditEventListResponse'
+
+  /attachments/upload:
+    post:
+      summary: Upload attachment
+      tags: [attachments]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AttachmentUploadRequest'
+      responses:
+        '200':
+          description: Attachment uploaded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttachmentResponse'
+
+  /attachments:
+    get:
+      summary: List attachments
+      tags: [attachments]
+      responses:
+        '200':
+          description: Attachment list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttachmentListResponse'
+
+  /attachments/{attachment_id}:
+    delete:
+      summary: Delete attachment
+      tags: [attachments]
+      parameters:
+        - in: path
+          name: attachment_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Attachment deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttachmentResponse'
+
+  /settings:
+    post:
+      summary: Upsert setting
+      tags: [settings]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SettingUpsertRequest'
+      responses:
+        '200':
+          description: Setting updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingResponse'
+    get:
+      summary: List settings
+      tags: [settings]
+      responses:
+        '200':
+          description: Settings list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingListResponse'
+
+  /settings/{key}:
+    get:
+      summary: Get setting by key
+      tags: [settings]
+      parameters:
+        - in: path
+          name: key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Setting detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingResponse'
 
 components:
   schemas:
@@ -764,6 +964,229 @@ components:
           type: integer
         active_debts:
           type: integer
+
+    ReconciliationCreateRequest:
+      type: object
+      required: [account_id, period_start, period_end, statement_balance]
+      properties:
+        account_id:
+          type: string
+        period_start:
+          type: string
+          format: date
+        period_end:
+          type: string
+          format: date
+        statement_balance:
+          type: number
+        notes:
+          type: string
+
+    ReconciliationResolveRequest:
+      type: object
+      properties:
+        notes:
+          type: string
+
+    ReconciliationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        account_id:
+          type: string
+        period_start:
+          type: string
+          format: date
+        period_end:
+          type: string
+          format: date
+        book_balance:
+          type: number
+        statement_balance:
+          type: number
+        difference_amount:
+          type: number
+        status:
+          type: string
+        notes:
+          type: string
+        resolved_on:
+          type: string
+          nullable: true
+
+    ReconciliationListResponse:
+      type: object
+      properties:
+        reconciliations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReconciliationResponse'
+
+    AlertResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        module:
+          type: string
+        severity:
+          type: string
+        channel:
+          type: string
+        title:
+          type: string
+        message:
+          type: string
+        reference_type:
+          type: string
+          nullable: true
+        reference_id:
+          type: string
+          nullable: true
+        status:
+          type: string
+        triggered_on:
+          type: string
+          format: date-time
+        read_on:
+          type: string
+          format: date-time
+          nullable: true
+
+    AlertListResponse:
+      type: object
+      properties:
+        alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AlertResponse'
+
+    EvaluateAlertsResponse:
+      type: object
+      properties:
+        generated:
+          type: integer
+
+    AuditEventResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        organization_id:
+          type: string
+          nullable: true
+        user_id:
+          type: string
+          nullable: true
+        module:
+          type: string
+        action:
+          type: string
+        entity_type:
+          type: string
+          nullable: true
+        entity_id:
+          type: string
+          nullable: true
+        trace_id:
+          type: string
+          nullable: true
+        details:
+          type: object
+        occurred_on:
+          type: string
+          format: date-time
+
+    AuditEventListResponse:
+      type: object
+      properties:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditEventResponse'
+
+    AttachmentUploadRequest:
+      type: object
+      required: [module, entity_id, file]
+      properties:
+        module:
+          type: string
+        entity_id:
+          type: string
+        file:
+          type: string
+          format: binary
+
+    AttachmentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        module:
+          type: string
+        entity_id:
+          type: string
+        file_name:
+          type: string
+        mime_type:
+          type: string
+        size_bytes:
+          type: integer
+        status:
+          type: string
+
+    AttachmentListResponse:
+      type: object
+      properties:
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttachmentResponse'
+
+    SettingUpsertRequest:
+      type: object
+      required: [key, value]
+      properties:
+        key:
+          type: string
+        value:
+          oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+            - type: object
+            - type: array
+        value_type:
+          type: string
+        is_sensitive:
+          type: boolean
+
+    SettingResponse:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+            - type: object
+            - type: array
+            - type: 'null'
+        value_type:
+          type: string
+        is_sensitive:
+          type: boolean
+
+    SettingListResponse:
+      type: object
+      properties:
+        settings:
+          type: array
+          items:
+            $ref: '#/components/schemas/SettingResponse'
 
     MessageResponse:
       type: object

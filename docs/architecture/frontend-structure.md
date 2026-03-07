@@ -1,13 +1,28 @@
 # Frontend Structure
 
-Frontend con Next.js (App Router), arquitectura híbrida por módulos.
+Frontend en Next.js (App Router) con estructura hibrida por rutas y modulos.
 
-## Distribución
-- `src/app`: shell, rutas base y route groups.
-- `src/shared`: UI, utilidades, hooks, configuración y tipos comunes.
-- `src/modules`: funcionalidades por dominio.
+## Estructura
+- `src/app`: rutas, layout global y route groups.
+- `src/modules`: logica de presentacion por dominio.
+- `src/shared`: configuracion, tipos, utilidades y UI compartida.
 
-## Reglas
-- Componentes compartidos en `shared/ui`.
-- Lógica de cada dominio en su módulo correspondiente.
-- No acoplar vistas a detalles de infraestructura HTTP.
+## Estado actual
+- Implementado:
+  - login en `src/modules/auth-users`
+  - dashboard ejecutivo en `src/modules/dashboard`
+- Base creada (sin UI funcional completa):
+  - modulos restantes en `src/modules/*` con README por modulo.
+
+## Convenciones por modulo
+Estructura recomendada por modulo frontend:
+- `api/`: cliente HTTP del modulo
+- `components/`: componentes de interfaz del modulo
+- `hooks/`: estado y composicion (cuando aplique)
+- `README.md`: alcance y reglas del modulo
+
+## Reglas de implementacion
+- Evitar llamadas HTTP directamente desde componentes de pagina.
+- Reutilizar tipos compartidos para errores y respuestas comunes.
+- Mantener formularios con validacion y mensajes consistentes.
+- No mezclar estado global del shell con estado especifico de modulo.

@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_db
 from app.core.errors import AppError
+from app.domains.audit.application.service import AuditService
 from app.domains.accounts.application.schemas import AccountCreateRequest, AccountResponse
 from app.domains.accounts.infrastructure.models import FinancialAccount
 from app.domains.accounts.infrastructure.repository import AccountRepository
@@ -18,8 +19,15 @@ class AccountsService:
     def __init__(self, db: Session):
         self.db = db
         self.repo = AccountRepository(db)
+        self.audit = AuditService(db)
 
-    def create_account(self, organization_id: str, payload: AccountCreateRequest) -> FinancialAccount:
+    def create_account(
+        self,
+        organization_id: str,
+        payload: AccountCreateRequest,
+        actor_user_id: str | None = None,
+        trace_id: str | None = None,
+    ) -> FinancialAccount:
         if payload.account_type.lower() not in ALLOWED_ACCOUNT_TYPES:
             raise AppError("VALIDATION_ERROR", "Invalid account_type", 400)
         if payload.initial_balance < 0:
@@ -35,6 +43,17 @@ class AccountsService:
             currency_code=payload.currency_code.upper(),
             initial_balance=Decimal(payload.initial_balance),
         )
+        if actor_user_id:
+            self.audit.record_event(
+                organization_id=organization_id,
+                user_id=actor_user_id,
+                module="accounts",
+                action="create",
+                entity_type="financial_account",
+                entity_id=account.id,
+                trace_id=trace_id,
+                details={"name": account.name, "account_type": account.account_type},
+            )
         self.db.commit()
         return account
 

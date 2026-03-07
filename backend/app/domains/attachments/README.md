@@ -1,16 +1,7 @@
 # Domain: attachments
 
-## Objetivo
-Definir capacidades de negocio del dominio attachments de forma modular y mantenible.
+Gestiona adjuntos con almacenamiento desacoplado.
 
-## Entidades principales
-- Por definir en Fase 2.
-
-## Casos de uso
-- Por definir en Fase 2.
-
-## Permisos esperados
-- read, create, update, delete (segun matriz RBAC).
-
-## Eventos auditables
-- Creacion, actualizacion, eliminacion y acciones criticas del dominio.
+- Valida tamano y tipo MIME permitido.
+- Guarda metadata, checksum y ruta de almacenamiento.
+- Soporta carga, listado y borrado logico.

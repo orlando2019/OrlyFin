@@ -1,16 +1,6 @@
 # Domain: reconciliation
 
-## Objetivo
-Definir capacidades de negocio del dominio reconciliation de forma modular y mantenible.
+Gestiona conciliaciones por cuenta financiera.
 
-## Entidades principales
-- Por definir en Fase 2.
-
-## Casos de uso
-- Por definir en Fase 2.
-
-## Permisos esperados
-- read, create, update, delete (segun matriz RBAC).
-
-## Eventos auditables
-- Creacion, actualizacion, eliminacion y acciones criticas del dominio.
+- Compara saldo libro (`book_balance`) con saldo extracto (`statement_balance`).
+- Calcula diferencia y estado (`balanced`, `unbalanced`, `resolved`).

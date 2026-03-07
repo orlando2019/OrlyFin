@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, status
 
+from app.core.dependencies import get_trace_id
 from app.domains.auth_users.application.service import get_current_user
 from app.domains.auth_users.infrastructure.models import User
 from app.domains.income.application.schemas import IncomeCreateRequest, IncomeListResponse
@@ -15,9 +16,10 @@ router = APIRouter(prefix="/incomes", tags=["income"])
 def create_income(
     payload: IncomeCreateRequest,
     current_user: User = Depends(get_current_user),
+    trace_id: str = Depends(get_trace_id),
     service: IncomeService = Depends(get_income_service),
 ):
-    record = service.create_income(current_user.organization_id, payload)
+    record = service.create_income(current_user.organization_id, payload, actor_user_id=current_user.id, trace_id=trace_id)
     return to_income_response(record)
 
 

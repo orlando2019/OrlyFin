@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.core.dependencies import get_db
 from app.core.errors import AppError
 from app.domains.accounts.infrastructure.repository import AccountRepository
+from app.domains.audit.application.service import AuditService
 from app.domains.debt.infrastructure.repository import DebtRepository
 from app.domains.expense.infrastructure.repository import ExpenseRepository
 from app.domains.payment.application.schemas import PaymentCreateRequest, PaymentResponse
@@ -25,8 +26,15 @@ class PaymentService:
         self.accounts_repo = AccountRepository(db)
         self.expense_repo = ExpenseRepository(db)
         self.debt_repo = DebtRepository(db)
+        self.audit = AuditService(db)
 
-    def create_payment(self, organization_id: str, payload: PaymentCreateRequest) -> PaymentRecord:
+    def create_payment(
+        self,
+        organization_id: str,
+        payload: PaymentCreateRequest,
+        actor_user_id: str | None = None,
+        trace_id: str | None = None,
+    ) -> PaymentRecord:
         if payload.amount <= 0:
             raise AppError("VALIDATION_ERROR", "amount must be > 0", 400)
         if payload.payment_type not in ALLOWED_PAYMENT_TYPES:
@@ -79,6 +87,23 @@ class PaymentService:
             reference_id=payload.reference_id,
             notes=payload.notes,
         )
+
+        if actor_user_id:
+            self.audit.record_event(
+                organization_id=organization_id,
+                user_id=actor_user_id,
+                module="payment",
+                action="create",
+                entity_type="payment_record",
+                entity_id=payment.id,
+                trace_id=trace_id,
+                details={
+                    "payment_type": payload.payment_type,
+                    "amount": str(payload.amount),
+                    "reference_type": payload.reference_type,
+                    "reference_id": payload.reference_id,
+                },
+            )
 
         self.db.commit()
         return payment

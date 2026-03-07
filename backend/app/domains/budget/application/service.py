@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_db
 from app.core.errors import AppError
+from app.domains.audit.application.service import AuditService
 from app.domains.budget.application.schemas import BudgetCreateRequest, BudgetResponse
 from app.domains.budget.infrastructure.models import BudgetRecord
 from app.domains.budget.infrastructure.repository import BudgetRepository
@@ -18,8 +19,15 @@ class BudgetService:
         self.db = db
         self.repo = BudgetRepository(db)
         self.expense_repo = ExpenseRepository(db)
+        self.audit = AuditService(db)
 
-    def create_budget(self, organization_id: str, payload: BudgetCreateRequest) -> BudgetRecord:
+    def create_budget(
+        self,
+        organization_id: str,
+        payload: BudgetCreateRequest,
+        actor_user_id: str | None = None,
+        trace_id: str | None = None,
+    ) -> BudgetRecord:
         if payload.planned_amount <= 0:
             raise AppError("VALIDATION_ERROR", "planned_amount must be > 0", 400)
         if payload.period_end < payload.period_start:
@@ -35,6 +43,17 @@ class BudgetService:
             planned_amount=Decimal(payload.planned_amount),
             alert_threshold_percent=Decimal(payload.alert_threshold_percent),
         )
+        if actor_user_id:
+            self.audit.record_event(
+                organization_id=organization_id,
+                user_id=actor_user_id,
+                module="budget",
+                action="create",
+                entity_type="budget_record",
+                entity_id=record.id,
+                trace_id=trace_id,
+                details={"category": payload.category, "planned_amount": str(payload.planned_amount)},
+            )
         self.db.commit()
         return record
 

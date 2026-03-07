@@ -1,16 +1,6 @@
 # Domain: audit
 
-## Objetivo
-Definir capacidades de negocio del dominio audit de forma modular y mantenible.
+Gestiona eventos de auditoria con trazabilidad.
 
-## Entidades principales
-- Por definir en Fase 2.
-
-## Casos de uso
-- Por definir en Fase 2.
-
-## Permisos esperados
-- read, create, update, delete (segun matriz RBAC).
-
-## Eventos auditables
-- Creacion, actualizacion, eliminacion y acciones criticas del dominio.
+- Registra `module`, `action`, `entity`, `trace_id`, `user` y detalles.
+- Exposicion de consulta para revision operativa.

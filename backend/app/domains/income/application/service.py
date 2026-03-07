@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_db
 from app.core.errors import AppError
+from app.domains.audit.application.service import AuditService
 from app.domains.accounts.infrastructure.repository import AccountRepository
 from app.domains.income.application.schemas import IncomeCreateRequest, IncomeResponse
 from app.domains.income.infrastructure.models import IncomeRecord
@@ -20,8 +21,15 @@ class IncomeService:
         self.db = db
         self.repo = IncomeRepository(db)
         self.accounts_repo = AccountRepository(db)
+        self.audit = AuditService(db)
 
-    def create_income(self, organization_id: str, payload: IncomeCreateRequest) -> IncomeRecord:
+    def create_income(
+        self,
+        organization_id: str,
+        payload: IncomeCreateRequest,
+        actor_user_id: str | None = None,
+        trace_id: str | None = None,
+    ) -> IncomeRecord:
         if payload.amount <= 0:
             raise AppError("VALIDATION_ERROR", "amount must be > 0", 400)
         if payload.income_type not in ALLOWED_INCOME_TYPES:
@@ -46,6 +54,18 @@ class IncomeService:
 
         if account is not None:
             account.current_balance = Decimal(account.current_balance) + Decimal(payload.amount)
+
+        if actor_user_id:
+            self.audit.record_event(
+                organization_id=organization_id,
+                user_id=actor_user_id,
+                module="income",
+                action="create",
+                entity_type="income_record",
+                entity_id=record.id,
+                trace_id=trace_id,
+                details={"amount": str(payload.amount), "category": payload.category, "income_type": payload.income_type},
+            )
 
         self.db.commit()
         return record

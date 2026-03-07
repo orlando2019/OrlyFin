@@ -1,16 +1,6 @@
 # Domain: alerts
 
-## Objetivo
-Definir capacidades de negocio del dominio alerts de forma modular y mantenible.
+Gestiona alertas operativas internas y base para canal email.
 
-## Entidades principales
-- Por definir en Fase 2.
-
-## Casos de uso
-- Por definir en Fase 2.
-
-## Permisos esperados
-- read, create, update, delete (segun matriz RBAC).
-
-## Eventos auditables
-- Creacion, actualizacion, eliminacion y acciones criticas del dominio.
+- Genera alertas por reglas (presupuesto, vencimiento de deuda, umbral de pendientes).
+- Permite listar y marcar alertas como leidas.

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, status
 
+from app.core.dependencies import get_trace_id
 from app.domains.auth_users.application.service import get_current_user
 from app.domains.auth_users.infrastructure.models import User
 from app.domains.payment.application.schemas import PaymentCreateRequest, PaymentListResponse
@@ -15,9 +16,10 @@ router = APIRouter(prefix="/payments", tags=["payment"])
 def create_payment(
     payload: PaymentCreateRequest,
     current_user: User = Depends(get_current_user),
+    trace_id: str = Depends(get_trace_id),
     service: PaymentService = Depends(get_payment_service),
 ):
-    record = service.create_payment(current_user.organization_id, payload)
+    record = service.create_payment(current_user.organization_id, payload, actor_user_id=current_user.id, trace_id=trace_id)
     return to_payment_response(record)
 
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, status
 
+from app.core.dependencies import get_trace_id
 from app.domains.auth_users.application.service import get_current_user
 from app.domains.auth_users.infrastructure.models import User
 from app.domains.budget.application.schemas import BudgetCreateRequest, BudgetListResponse
@@ -15,9 +16,10 @@ router = APIRouter(prefix="/budgets", tags=["budget"])
 def create_budget(
     payload: BudgetCreateRequest,
     current_user: User = Depends(get_current_user),
+    trace_id: str = Depends(get_trace_id),
     service: BudgetService = Depends(get_budget_service),
 ):
-    record = service.create_budget(current_user.organization_id, payload)
+    record = service.create_budget(current_user.organization_id, payload, actor_user_id=current_user.id, trace_id=trace_id)
     return service.to_budget_response(current_user.organization_id, record)
 
 
